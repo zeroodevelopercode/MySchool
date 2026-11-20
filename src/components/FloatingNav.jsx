@@ -31,12 +31,11 @@ function shape(w, cx) {
 }
 
 export default function FloatingNav({ active, onChange, hidden = false, role = "student", actionOpen = false, onActionToggle }) {
-  const wrap = useRef(null), glass = useRef(null), line = useRef(null), shadow = useRef(null), first = useRef(true);
+  const wrap = useRef(null), itemsWrap = useRef(null), glass = useRef(null), line = useRef(null), shadow = useRef(null), first = useRef(true);
   const [w, setW] = useState(0);
   const canManage = ["developers", "teacher", "leader_school"].includes(role);
   const items = canManage ? [...TABS.slice(0, 2), { id: "Aksi", label: "Aksi", icon: Plus }, ...TABS.slice(2)] : TABS;
   const selectedIndex = actionOpen && canManage ? 2 : Math.max(0, items.findIndex(tab => tab.id === active));
-  const col = w ? PAD + ((w - PAD * 2) / items.length) * (selectedIndex + .5) : 0;
   const x = useMotionValue(0), sx = useSpring(x, SPRING), bubbleX = useTransform(sx, value => value - 26);
 
   useLayoutEffect(() => {
@@ -49,10 +48,17 @@ export default function FloatingNav({ active, onChange, hidden = false, role = "
     return () => observer.disconnect();
   }, []);
   useLayoutEffect(() => {
-    if (!w) return;
-    x.set(col);
-    if (first.current) { sx.jump(col); first.current = false; }
-  }, [col, w, x, sx]);
+    const nav = wrap.current;
+    const selectedItem = itemsWrap.current?.children[selectedIndex];
+    if (!nav || !selectedItem || !w) return;
+    // Ambil titik tengah tombol sebenarnya agar bulatan tetap tepat di bawah icon,
+    // termasuk saat padding navbar berubah pada ukuran layar HP.
+    const navRect = nav.getBoundingClientRect();
+    const itemRect = selectedItem.getBoundingClientRect();
+    const center = itemRect.left - navRect.left + itemRect.width / 2;
+    x.set(center);
+    if (first.current) { sx.jump(center); first.current = false; }
+  }, [selectedIndex, w, items.length, x, sx]);
 
   const apply = useCallback(cx => {
     if (!w) return;
@@ -78,7 +84,7 @@ export default function FloatingNav({ active, onChange, hidden = false, role = "
         <div className="nv-glass" ref={glass}/>
         <svg className="nv-line" viewBox={"0 0 " + (w || 1) + " " + H} aria-hidden="true"><path ref={line}/></svg>
         <motion.span className="nv-bubble" style={{ x: bubbleX }}/>
-        <div className="nv-items">
+        <div className="nv-items" ref={itemsWrap}>
           {items.map(({ id, label, icon: Icon }) => {
             const isAction = id === "Aksi";
             const selected = isAction ? actionOpen : active === id && !actionOpen;
