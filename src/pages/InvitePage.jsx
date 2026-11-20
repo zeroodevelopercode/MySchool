@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { GraduationCap, CheckCircle2, LoaderCircle } from "lucide-react";
 import { useAuth } from "../auth/AuthProvider.jsx";
 import { supabase } from "../lib/supabase.js";
-import { Capacitor } from "@capacitor/core";
 
 export default function InvitePage({ classId }) {
   const { user, profile, signInWithProvider } = useAuth();
@@ -11,7 +10,6 @@ export default function InvitePage({ classId }) {
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
-  const isNativeApp = Capacitor.isNativePlatform();
 
   useEffect(() => {
     let active = true;
@@ -40,18 +38,6 @@ export default function InvitePage({ classId }) {
     if (acceptError) setError(acceptError.message?.includes("already") ? "Akunmu sudah terdaftar di kelas lain." : "Undangan gagal diterima. Coba lagi atau hubungi wali kelas.");
     else setNotice(data?.message || "Berhasil bergabung ke kelas " + (invite?.class_name || "") + ".");
   };
-
-  if (!isNativeApp) return <main className="student-invite-page">
-    <section className="student-invite-card">
-      <div className="student-invite-mark"><GraduationCap size={29}/></div>
-      <small>SEKOLAHKU • UNDANGAN KELAS</small>
-      <h1>Buka undangan di aplikasi</h1>
-      <p>Link undangan kelas hanya bisa dibuka melalui aplikasi SekolahKu. Website tidak dapat menerima undangan kelas.</p>
-      <div className="student-invite-class"><strong>Kenapa link ditolak?</strong><span> Aplikasi SekolahKu belum terdeteksi di perangkat ini, atau link dibuka melalui browser.</span></div>
-      <a className="student-invite-action" href="https://github.com/zeroodevelopercode/MySchool/releases/latest/download/SekolahKu.apk">Download / Install SekolahKu</a>
-      <p className="student-invite-note">Setelah aplikasi terpasang, buka kembali link undangan yang sama. Android akan mengarahkannya ke aplikasi jika App Links sudah terverifikasi.</p>
-    </section>
-  </main>;
 
   return <main className="student-invite-page">
     <section className="student-invite-card">
