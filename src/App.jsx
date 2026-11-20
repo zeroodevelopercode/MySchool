@@ -57,31 +57,42 @@ function AppContent() {
 
   useEffect(() => {
     let listener;
-    NativeApp.addListener("appUrlOpen", async ({ url }) => {
+    let active = true;
+    const handleAuthUrl = async (url) => {
       try {
         const incoming = new URL(url);
+        if (incoming.protocol !== "com.zeroodev.sekolahku:") return;
         const code = incoming.searchParams.get("code");
         if (code) {
           await Browser.close().catch(() => {});
-          const result = await supabase?.auth.exchangeCodeForSession(code);
-          if (result?.error) throw result.error;
-        }
-        const hash = new URLSearchParams(incoming.hash.replace(/^#/, ""));
-        const access_token = hash.get("access_token");
-        const refresh_token = hash.get("refresh_token");
-        if (access_token && refresh_token) {
-          await supabase?.auth.setSession({ access_token, refresh_token });
-        }
-        if (incoming.protocol !== "com.zeroodev.sekolahku:") {
-          const nextPath = incoming.pathname + incoming.search + incoming.hash;
-          window.history.replaceState(null, "", nextPath);
-          setPath(incoming.pathname);
+          const { error } = await supabase.auth.exchangeCodeForSession(code);
+          if (error) throw error;
+        } else {
+          const hash = new URLSearchParams(incoming.hash.replace(/^#/, ""));
+          const access_token = hash.get("access_token");
+          const refresh_token = hash.get("refresh_token");
+          if (access_token && refresh_token) {
+            const { error } = await supabase.auth.setSession({ access_token, refresh_token });
+            if (error) throw error;
+          } else {
+            throw new Error("Callback login tidak membawa authorization code atau session token.");
+          }
         }
       } catch (error) {
-        console.error("Deep link SekolahKu tidak dapat diproses:", error);
+        console.error("Callback login SekolahKu gagal:", error);
       }
-    }).then(value => { listener = value; });
-    return () => { listener?.remove(); };
+    };
+
+    NativeApp.addListener("appUrlOpen", ({ url }) => handleAuthUrl(url))
+      .then(value => { listener = value; });
+    NativeApp.getLaunchUrl().then(result => {
+      if (active && result?.url) handleAuthUrl(result.url);
+    }).catch(error => console.warn("Gagal membaca deep link awal:", error));
+
+    return () => {
+      active = false;
+      listener?.remove();
+    };
   }, []);
 
   if (loading || (user && profileLoading)) {
