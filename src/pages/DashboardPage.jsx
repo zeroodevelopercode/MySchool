@@ -4,7 +4,7 @@ import { Home, ClipboardCheck, CalendarDays, UserRound, GraduationCap, Clock3, M
 import { useAuth } from "../auth/AuthProvider.jsx";
 import { supabase } from "../lib/supabase.js";
 
-const DETAIL_PAGES = ["Notifikasi kelas", "Kelola guru", "Handle absensi murid", "Sampaikan pengumuman"];
+const DETAIL_PAGES = ["Notifikasi kelas", "Kelola guru", "Handle absensi murid", "Sampaikan pengumuman", "Manage class"];
 const ROLE_LABELS = { developers: "Developers", teacher: "Teacher", leader_school: "Leader School", student: "Student" };
 
 function calculateAge(dateString) {
@@ -46,6 +46,7 @@ export default function DashboardPage() {
   const [pageNotice, setPageNotice] = useState("");
   const [announcementTitle, setAnnouncementTitle] = useState("");
   const [announcementBody, setAnnouncementBody] = useState("");
+  const [newClassName, setNewClassName] = useState("");
   const [saving, setSaving] = useState(false);
 
   const displayName = profile?.full_name || "Siswa";
@@ -109,7 +110,7 @@ export default function DashboardPage() {
           setPageError(error ? "Daftar guru belum dapat dimuat." : "");
           setPageLoading(false);
         }
-      } else if (["Handle absensi murid", "Sampaikan pengumuman"].includes(page)) {
+      } else if (["Handle absensi murid", "Sampaikan pengumuman", "Manage class"].includes(page)) {
         const { data, error } = await supabase.from("classes").select("id,name").eq("created_by", user.id).order("name");
         if (active) {
           setStaffClasses(data || []);
@@ -162,6 +163,17 @@ export default function DashboardPage() {
     setSaving(false);
     if (error) setPageError("Absensi gagal disimpan. Pastikan kamu pengelola kelas tersebut.");
     else setPageNotice("Absensi berhasil disimpan.");
+  };
+
+  const createClass = async (event) => {
+    event.preventDefault();
+    const name = newClassName.trim();
+    if (!name) return;
+    setSaving(true); setPageError(""); setPageNotice("");
+    const { data, error } = await supabase.from("classes").insert({ name, created_by: user.id }).select("id,name").single();
+    setSaving(false);
+    if (error) setPageError("Kelas gagal dibuat. Periksa izin pengelolaan kelas.");
+    else { setStaffClasses((current) => [...current, data].sort((a,b) => a.name.localeCompare(b.name))); setSelectedClass(data.id); setNewClassName(""); setPageNotice("Kelas berhasil dibuat."); }
   };
 
   const publishAnnouncement = async (event) => {
@@ -224,6 +236,18 @@ export default function DashboardPage() {
         <p className="student-manage-description">Daftar akun yang memiliki role Teacher di SekolahKu.</p>
         {pageLoading ? <div className="student-announcement-empty"><LoaderCircle size={24}/><h2>Memuat akun guru</h2></div> : pageError ? <p className="student-form-error">{pageError}</p> : teachers.length ? <div className="student-teacher-list">{teachers.map((teacher) => <article className="student-teacher-row" key={teacher.id}><span className="student-teacher-avatar">{teacher.avatar_url ? <img src={teacher.avatar_url} alt=""/> : (teacher.full_name || "G").slice(0,1).toUpperCase()}</span><span><strong>{teacher.full_name || "Guru tanpa nama"}</strong><small>Role: Teacher</small></span><span className="student-role-pill">TEACHER</span></article>)}</div> : <div className="student-announcement-empty"><Users size={25}/><h2>Belum ada akun guru</h2><p>Akun yang sudah diberi role Teacher akan tampil di sini.</p></div>}
         <p className="student-manage-footnote">Pengubahan role dan pembuatan akun dikelola secara aman melalui administrasi database.</p>
+      </section>}
+
+      {page === "Manage class" && <section className="student-page student-manage-page">
+        <div className="student-page-heading"><span className="student-page-icon violet"><School size={23}/></span><div><span>MANAJEMEN SEKOLAH</span><h1>Manage class</h1></div></div>
+        <p className="student-manage-description">Buat dan kelola daftar kelas yang menjadi tanggung jawab akunmu.</p>
+        <form className="student-announcement-form" onSubmit={createClass}>
+          <div className="student-form-field"><label htmlFor="new-class-name">Nama kelas</label><input id="new-class-name" value={newClassName} onChange={(e) => setNewClassName(e.target.value)} placeholder="Contoh: 7A, 8B, XII IPA 1" maxLength={60} required /></div>
+          <button className="student-primary-action" type="submit" disabled={saving}>{saving ? "Menyimpan..." : "Buat kelas"}</button>
+        </form>
+        <div className="student-teacher-list">{staffClasses.length ? staffClasses.map((item) => <article className="student-teacher-row" key={item.id}><span className="student-teacher-avatar"><School size={18}/></span><span><strong>{item.name}</strong><small>Kelas yang kamu kelola</small></span><span className="student-role-pill">KELAS</span></article>) : <div className="student-announcement-empty"><School size={25}/><h2>Belum ada kelas</h2><p>Buat kelas pertama untuk mulai mengelola siswa.</p></div>}</div>
+        {pageNotice && <p className="student-form-success">{pageNotice}</p>}
+        {pageError && <p className="student-form-error">{pageError}</p>}
       </section>}
 
       {page === "Handle absensi murid" && <section className="student-page student-manage-page">
