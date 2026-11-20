@@ -67,7 +67,7 @@ export default function FloatingNav({ active, onChange, hidden = false, role = "
 
   const selectAction = id => { onChange(id); };
   return (
-    <motion.nav className={"nv" + (hidden ? " nv-hidden" : "")} aria-label="Navigasi utama"
+    <motion.nav className={"nv" + (canManage ? " nv-manage" : "") + (hidden ? " nv-hidden" : "")} aria-label="Navigasi utama"
       initial={false} animate={{ y: hidden ? 120 : 0, opacity: hidden ? 0 : 1 }}
       transition={{ type: "spring", stiffness: 260, damping: 30 }}>
       <div className="nv-wrap" ref={wrap}>
