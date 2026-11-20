@@ -107,7 +107,7 @@ export default function FloatingNav({ active, onChange, hidden = false, role = "
                 }
               }}>
               <motion.span className="nv-icon" initial={false}
-                animate={{ y: selected ? -23 : 0, scale: selected ? 1.12 : 1, rotate: false }}
+                animate={{ top: selected ? -10 : 13, y: 0, scale: selected ? 1.12 : 1, rotate: false }}
                 transition={{ type: "spring", ...SPRING }}>
                 {isAction ? (actionOpen ? <Megaphone size={21} strokeWidth={2.3}/> : <Plus size={22} strokeWidth={2.4}/>) : <Icon size={20} strokeWidth={2.1}/>}
               </motion.span>
