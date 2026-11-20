@@ -21,11 +21,22 @@ function AppContent() {
 
   useEffect(() => {
     if (!Capacitor.isNativePlatform()) return;
-    let subscription;
+    const subscriptions = [];
     ApkUpdate.addListener("downloadProgress", event => {
       setUpdateProgress(Math.max(0, Math.min(100, Number(event.percent) || 0)));
-    }).then(handle => { subscription = handle; });
-    return () => { subscription?.remove(); };
+    }).then(handle => subscriptions.push(handle));
+    ApkUpdate.addListener("installPermissionRequired", () => {
+      setUpdateBusy(false);
+      setUpdateMessage("Izinkan SekolahKu memasang aplikasi dari sumber ini, lalu tekan Install update here lagi.");
+    }).then(handle => subscriptions.push(handle));
+    ApkUpdate.addListener("updateError", event => {
+      setUpdateBusy(false);
+      setUpdateMessage(event.message || "Pembaruan gagal diproses.");
+    }).then(handle => subscriptions.push(handle));
+    NativeApp.addListener("appStateChange", ({ isActive }) => {
+      if (isActive) setUpdateBusy(false);
+    }).then(handle => subscriptions.push(handle));
+    return () => { subscriptions.forEach(handle => handle.remove()); };
   }, []);
 
   const installAppUpdate = async () => {
@@ -33,13 +44,8 @@ function AppContent() {
     setUpdateBusy(true);
     setUpdateMessage("");
     try {
-      const result = await ApkUpdate.downloadAndInstall({ url: appUpdate.url });
-      if (result?.permissionRequired) {
-        setUpdateMessage("Izinkan SekolahKu memasang pembaruan, lalu tekan Install update here sekali lagi.");
-        setUpdateBusy(false);
-      } else {
-        setUpdateMessage("Unduhan selesai. Lanjutkan konfirmasi di Package Installer Android.");
-      }
+      await ApkUpdate.downloadAndInstall({ url: appUpdate.url });
+      setUpdateMessage("Mengunduh pembaruan SekolahKu...");
     } catch (error) {
       setUpdateMessage(error?.message || "Pembaruan gagal diproses. Coba lagi.");
       setUpdateBusy(false);
