@@ -314,10 +314,10 @@
 }
 
 
-/* Keep action bubbles centered on the navbar's actual Plus slot */
+/* Align the action cluster to the Plus center; use margin because Framer Motion owns transform */
 @media(max-width:899px){
  .nv-wrap{position:relative}
- .nv-actions{position:absolute;left:50%;right:auto;top:auto;bottom:125px;transform:translateX(-50%);width:180px;height:132px}
+ .nv-actions{position:absolute;left:calc(50% - 90px);right:auto;top:auto;bottom:45px;margin:0;transform:none;width:180px;height:132px}
  .nv-action-0{left:0;right:auto;top:58px}
  .nv-action-1{left:calc(50% - 33px);right:auto;top:0}
  .nv-action-2{left:auto;right:0;top:58px}
