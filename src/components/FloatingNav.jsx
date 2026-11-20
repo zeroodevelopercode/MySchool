@@ -1,6 +1,6 @@
 import { useCallback, useLayoutEffect, useRef, useState } from "react";
 import { motion, useMotionValue, useMotionValueEvent, useSpring, useTransform, AnimatePresence } from "framer-motion";
-import { Home, ClipboardCheck, CalendarDays, UserRound, Plus, X, Users, ClipboardList, Megaphone } from "lucide-react";
+import { Home, ClipboardCheck, CalendarDays, UserRound, Plus, X, Users, ClipboardList, Megaphone, School } from "lucide-react";
 
 export const TABS = [
   { id: "Beranda", label: "Beranda", icon: Home },
@@ -12,7 +12,8 @@ export const TABS = [
 const ACTIONS = [
   { id: "Kelola guru", label: "Kelola guru", shortLabel: "Guru", icon: Users },
   { id: "Handle absensi murid", label: "Handle absensi murid", shortLabel: "Absensi murid", icon: ClipboardList },
-  { id: "Sampaikan pengumuman", label: "Sampaikan pengumuman", shortLabel: "Pengumuman", icon: Megaphone }
+  { id: "Sampaikan pengumuman", label: "Sampaikan pengumuman", shortLabel: "Pengumuman", icon: Megaphone },
+  { id: "Manage class", label: "Manage class", shortLabel: "Kelas", icon: School }
 ];
 
 const H = 64, CORNER = 17, DEPTH = 29, PAD = 9, NOTCH = 43;
