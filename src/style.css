@@ -308,3 +308,7 @@
  .student-attendance-row select{width:125px}
  .nv-actions{bottom:75px}
 }
+
+@media(min-width:900px){
+ .nv-action-toggle[aria-current="page"] .nv-icon{color:#514be8}
+}
