@@ -380,3 +380,20 @@
 .student-header-logout:disabled{opacity:.55;cursor:wait}
 .nv-action-toggle .nv-label{font-size:9px}
 @media(max-width:420px){.student-header-logout{right:10px;min-height:33px;padding:0 8px;font-size:9px;gap:5px}.student-header-logout svg{width:14px;height:14px}}
+
+
+/* App-wide anti-selection; editable fields remain selectable */
+*,*::before,*::after{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+input,textarea,[contenteditable="true"],[data-allow-select="true"]{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
+
+/* Native app update sheet */
+.app-update-sheet{position:fixed;z-index:250;left:14px;right:14px;bottom:calc(14px + env(safe-area-inset-bottom));display:flex;align-items:center;gap:12px;padding:15px 48px 15px 16px;background:rgba(255,255,255,.97);border:1px solid #e8e7fb;border-radius:17px;box-shadow:0 14px 42px rgba(35,32,91,.2);backdrop-filter:blur(18px);animation:appUpdateRise .42s cubic-bezier(.2,.8,.2,1) both}
+.app-update-copy{display:flex;flex:1;min-width:0;flex-direction:column;gap:5px}
+.app-update-copy strong{font-size:12px;color:#34384d}
+.app-update-copy span{font-size:10px;color:#9297a8}
+.app-update-sheet>button:not(.app-update-dismiss){min-height:39px;padding:0 13px;border:0;border-radius:10px;background:#514be8;color:#fff;font-size:10px;font-weight:800;white-space:nowrap}
+.app-update-sheet>button:not(.app-update-dismiss):active{transform:scale(.97)}
+.app-update-dismiss{position:absolute;right:9px;top:8px;width:27px;height:27px;border:0;border-radius:8px;background:#f3f3f8;color:#777d90;font-size:19px;line-height:1}
+@keyframes appUpdateRise{from{opacity:0;transform:translateY(35px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:390px){.app-update-sheet{left:9px;right:9px;gap:8px;padding:13px 39px 13px 12px}.app-update-copy strong{font-size:10px}.app-update-copy span{font-size:9px}.app-update-sheet>button:not(.app-update-dismiss){padding:0 9px;font-size:9px}}
+@media(prefers-reduced-motion:reduce){.app-update-sheet{animation:none}}
