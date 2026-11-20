@@ -13,6 +13,10 @@ export default function InvitePage({ classId }) {
 
   useEffect(() => {
     let active = true;
+    if (!user?.id) {
+      setLoading(false);
+      return () => { active = false; };
+    }
     (async () => {
       const { data, error: fetchError } = await supabase.rpc("get_class_invite_details", { p_class_id: classId });
       if (!active) return;
