@@ -15,3 +15,37 @@
 .profile-sync{display:flex;align-items:center;gap:6px}
 .auth-provider:disabled{opacity:.55;cursor:not-allowed;transform:none;box-shadow:none}
 @media(prefers-reduced-motion:reduce){.session-spinner{animation:none}}
+
+/* Fullscreen first-login profile onboarding */
+.onboarding-screen{min-height:100svh;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:34px 20px;background:#f7f8ff;color:#25283e}
+.onboarding-brand{position:absolute;top:30px;left:clamp(22px,6vw,88px);display:flex;align-items:center;gap:10px;font-weight:800;font-size:17px;z-index:1}
+.onboarding-logo{width:39px;height:39px;border-radius:12px;background:#514be8;color:white;display:grid;place-items:center}
+.onboarding-glow{position:absolute;width:360px;height:360px;border-radius:50%;filter:blur(2px);pointer-events:none}
+.onboarding-glow-one{background:#e9e8ff;top:-220px;right:-100px}
+.onboarding-glow-two{background:#e9f4ff;bottom:-250px;left:-100px}
+.onboarding-card{position:relative;z-index:1;width:min(100%,470px);background:#fff;border:1px solid #eceef6;border-radius:24px;padding:38px 42px;box-shadow:0 24px 70px #34346b12;animation:onboardIn .45s ease both}
+@keyframes onboardIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.onboarding-step{display:inline-flex;align-items:center;gap:7px;color:#625de5;background:#f1f0ff;padding:8px 11px;border-radius:30px;font-size:9px;font-weight:800;letter-spacing:1px}
+.onboarding-icon{width:54px;height:54px;border-radius:17px;background:#eeedff;color:#514be8;display:grid;place-items:center;margin:23px 0 17px}
+.onboarding-card h1{font-size:28px;letter-spacing:-1px;margin:0}
+.onboarding-description{font-size:12px;line-height:1.7;color:#9297a8;margin:9px 0 25px}
+.onboarding-form{display:grid;gap:9px}
+.onboarding-form>label{font-size:11px;font-weight:700;color:#45495d;margin-top:7px}
+.onboarding-input-wrap{height:48px;display:flex;align-items:center;gap:11px;padding:0 13px;border:1px solid #e8e9f1;border-radius:10px;color:#989daf;transition:border .2s,box-shadow .2s}
+.onboarding-input-wrap:focus-within{border-color:#817cf0;box-shadow:0 0 0 3px #817cf018}
+.onboarding-input-wrap input{width:100%;min-width:0;border:0;outline:0;background:transparent;color:#34384d;font-size:12px}
+.onboarding-input-wrap input:focus-visible{outline:0}
+.onboarding-input-wrap input::placeholder{color:#b3b6c2}
+.onboarding-age{font-size:10px;color:#a0a4b2;min-height:18px;margin-top:1px}
+.onboarding-age.is-visible{color:#777b91}
+.onboarding-age strong{color:#514be8;margin-left:4px}
+.onboarding-error{font-size:11px;color:#c34d5b;background:#fff0f1;border-radius:8px;padding:10px;margin:0}
+.onboarding-submit{height:48px;border:0;border-radius:10px;background:#514be8;color:white;font-size:12px;font-weight:700;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:10px;transition:background .2s,transform .2s}
+.onboarding-submit:hover{background:#403bd0;transform:translateY(-1px)}
+.onboarding-submit:disabled{opacity:.65;cursor:wait;transform:none}
+.onboarding-submit span{font-size:18px;line-height:1}
+.onboarding-privacy{font-size:9px;color:#a4a8b6;text-align:center;margin:19px 0 0}
+.onboarding-footer{position:absolute;bottom:20px;left:0;right:0;display:flex;justify-content:center;gap:12px;color:#a3a7b5;font-size:10px}
+.onboarding-footer span{color:#b5b8c3}
+@media(max-width:520px){.onboarding-screen{justify-content:center;padding:78px 16px 65px}.onboarding-brand{top:18px;left:18px}.onboarding-card{padding:27px 22px;border-radius:19px}.onboarding-card h1{font-size:25px}.onboarding-footer{bottom:14px;font-size:9px}}
+@media(prefers-reduced-motion:reduce){.onboarding-card{animation:none}}
