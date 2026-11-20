@@ -6,6 +6,7 @@ import DashboardPage from "./pages/DashboardPage.jsx";
 import InvitePage from "./pages/InvitePage.jsx";
 import InstallPage from "./pages/InstallPage.jsx";
 import { App as NativeApp } from "@capacitor/app";
+import { Browser } from "@capacitor/browser";
 import { Capacitor } from "@capacitor/core";
 import { supabase } from "./lib/supabase.js";
 
@@ -60,16 +61,22 @@ function AppContent() {
       try {
         const incoming = new URL(url);
         const code = incoming.searchParams.get("code");
-        if (code) await supabase?.auth.exchangeCodeForSession(code);
+        if (code) {
+          await Browser.close().catch(() => {});
+          const result = await supabase?.auth.exchangeCodeForSession(code);
+          if (result?.error) throw result.error;
+        }
         const hash = new URLSearchParams(incoming.hash.replace(/^#/, ""));
         const access_token = hash.get("access_token");
         const refresh_token = hash.get("refresh_token");
         if (access_token && refresh_token) {
           await supabase?.auth.setSession({ access_token, refresh_token });
         }
-        const nextPath = incoming.pathname + incoming.search + incoming.hash;
-        window.history.replaceState(null, "", nextPath);
-        setPath(incoming.pathname);
+        if (incoming.protocol !== "com.zeroodev.sekolahku:") {
+          const nextPath = incoming.pathname + incoming.search + incoming.hash;
+          window.history.replaceState(null, "", nextPath);
+          setPath(incoming.pathname);
+        }
       } catch (error) {
         console.error("Deep link SekolahKu tidak dapat diproses:", error);
       }
