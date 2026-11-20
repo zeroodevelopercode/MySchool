@@ -55,7 +55,24 @@ export function AuthProvider({ children }) {
         console.error("Gagal memuat profil SekolahKu:", error.message);
         if (active) setProfile(null);
       } else if (data) {
-        if (active) setProfile(data);
+        const metadata = user.user_metadata ?? {};
+        const patch = {};
+        if (!data.full_name) patch.full_name = metadata.full_name || metadata.name || metadata.user_name || user.email?.split("@")[0] || "Pengguna";
+        if (!data.avatar_url) patch.avatar_url = metadata.avatar_url || metadata.picture || null;
+        if (Object.keys(patch).length) {
+          const { data: updated, error: updateError } = await supabase
+            .from("profiles")
+            .update(patch)
+            .eq("id", user.id)
+            .select("id, full_name, avatar_url, role, created_at, updated_at")
+            .single();
+          if (active) {
+            if (updateError) setProfile(data);
+            else setProfile(updated);
+          }
+        } else if (active) {
+          setProfile(data);
+        }
       } else {
         const metadata = user.user_metadata ?? {};
         const fullName = metadata.full_name || metadata.name || user.email?.split("@")[0] || "Pengguna";
