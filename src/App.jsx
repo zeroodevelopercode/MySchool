@@ -4,6 +4,9 @@ import WelcomePage from "./pages/WelcomePage.jsx";
 import OnboardingPage from "./pages/OnboardingPage.jsx";
 import DashboardPage from "./pages/DashboardPage.jsx";
 import InvitePage from "./pages/InvitePage.jsx";
+import InstallPage from "./pages/InstallPage.jsx";
+import { App as NativeApp } from "@capacitor/app";
+import { supabase } from "./lib/supabase.js";
 
 function AppContent() {
   const { loading, user, profile, profileLoading } = useAuth();
@@ -29,7 +32,7 @@ function AppContent() {
   if (loading || (user && profileLoading)) {
     return <main className="session-loading"><div className="session-spinner" /><p>Memulihkan sesi SekolahKu...</p></main>;
   }
-  const inviteMatch = path.match(/^\/invite\/([0-9a-f-]{36})\/?$/i);
+  if (path === "/install" || path === "/install/") return <InstallPage />;\n  const inviteMatch = path.match(/^\/invite\/([0-9a-f-]{36})\/?$/i);
   if (inviteMatch && (!user || (profile?.full_name && profile?.birth_date))) return <InvitePage classId={inviteMatch[1]} />;
   if (!user) return <WelcomePage />;
   if (!profile?.full_name || !profile?.birth_date) return <OnboardingPage />;
