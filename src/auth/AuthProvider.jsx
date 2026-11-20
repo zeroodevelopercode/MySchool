@@ -90,6 +90,7 @@ export function AuthProvider({ children }) {
       return data;
     },
     async signInWithProvider(provider) {
+      if (window.location.pathname.startsWith("/invite/")) sessionStorage.setItem("sekolahku_post_auth_path", window.location.pathname);
       if (!supabaseConfigured) throw new Error("Konfigurasi Supabase belum tersedia. Tambahkan environment variable VITE_SUPABASE_URL dan VITE_SUPABASE_PUBLISHABLE_KEY.");
       const { error } = await supabase.auth.signInWithOAuth({ provider, options: { redirectTo: window.location.origin } });
       if (error) throw error;
