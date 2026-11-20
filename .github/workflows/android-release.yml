@@ -76,9 +76,7 @@ jobs:
         run: |
           mkdir -p release
           cp android/app/build/outputs/apk/debug/app-debug.apk release/SekolahKu.apk
-          gh release create android-build-${{ github.run_number }} release/SekolahKu.apk \\
-            --title "SekolahKu Android build ${{ github.run_number }}" \\
-            --notes "Build otomatis dari commit ${{ github.sha }}. APK debug untuk pengujian."
+          gh release create android-build-${{ github.run_number }} release/SekolahKu.apk --title "SekolahKu Android build ${{ github.run_number }}" --notes "Build otomatis dari commit ${{ github.sha }}. APK debug untuk pengujian."
 
       - name: Publish signing fingerprint for App Links
         id: fingerprint
