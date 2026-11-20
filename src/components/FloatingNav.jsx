@@ -81,7 +81,7 @@ export default function FloatingNav({ active, onChange, hidden = false, role = "
             return <button key={id} type="button" className={"nv-item" + (isAction ? " nv-action-toggle" : "")}
               aria-label={isAction ? (actionOpen ? "Tutup menu aksi" : "Buka menu aksi") : label}
               aria-current={selected ? "page" : undefined}
-              onClick={() => isAction ? onActionToggle() : onChange(id)}>
+              onClick={() => { if (isAction) onActionToggle(); else { if (actionOpen) onActionToggle(); onChange(id); } }}>
               <motion.span className="nv-icon" initial={false}
                 animate={{ y: selected ? -29 : 0, scale: selected ? 1.12 : 1, rotate: isAction && actionOpen ? 45 : 0 }}
                 transition={{ type: "spring", ...SPRING }}>
