@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import FloatingNav from "../components/FloatingNav.jsx";
 import { Home, ClipboardCheck, CalendarDays, UserRound, GraduationCap, BookOpen, Clock3, Mail, Cake, Users, CalendarPlus, LogOut } from "lucide-react";
 import { useAuth } from "../auth/AuthProvider.jsx";
 
@@ -98,8 +99,6 @@ export default function DashboardPage() {
       {notice && <p className="student-notice" role="alert">{notice}</p>}
     </main>
 
-    <nav className="floating-student-nav" aria-label="Navigasi utama">
-      {navigation.map(({id,label,icon:Icon}) => <button key={id} onClick={() => setPage(id)} className={page === id ? "selected" : ""} aria-current={page === id ? "page" : undefined}><Icon size={19}/><span>{label}</span></button>)}
-    </nav>
+    <FloatingNav active={page} onChange={setPage} />
   </div>;
 }
