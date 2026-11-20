@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import FloatingNav from "../components/FloatingNav.jsx";
-import { Home, ClipboardCheck, CalendarDays, UserRound, GraduationCap, Clock3, Mail, Cake, Users, CalendarPlus, Bell, ArrowLeft, School, Megaphone, UserCog, CheckCircle2, Send, LoaderCircle, MoreVertical, Copy, X } from "lucide-react";
+import { Home, ClipboardCheck, CalendarDays, UserRound, GraduationCap, Clock3, Mail, Cake, Users, CalendarPlus, Bell, ArrowLeft, School, Megaphone, UserCog, CheckCircle2, Send, LoaderCircle, MoreVertical, Copy, X, LogOut } from "lucide-react";
 import { useAuth } from "../auth/AuthProvider.jsx";
 import { supabase } from "../lib/supabase.js";
 
@@ -26,7 +26,7 @@ function formatAnnouncementDate(dateString) {
 }
 
 export default function DashboardPage() {
-  const { user, profile } = useAuth();
+  const { user, profile, signOut } = useAuth();
   const [page, setPage] = useState("Beranda");
   const [history, setHistory] = useState([]);
   const [actionOpen, setActionOpen] = useState(false);
@@ -53,6 +53,27 @@ export default function DashboardPage() {
   const [classRoster, setClassRoster] = useState([]);
   const [classTeacher, setClassTeacher] = useState(null);
   const [classDetailLoading, setClassDetailLoading] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
+
+  useEffect(() => {
+    if (!actionOpen) return undefined;
+    const closeOnOutside = (event) => {
+      if (!event.target.closest(".nv")) setActionOpen(false);
+    };
+    document.addEventListener("pointerdown", closeOnOutside);
+    return () => document.removeEventListener("pointerdown", closeOnOutside);
+  }, [actionOpen]);
+
+  const handleSignOut = async () => {
+    setSigningOut(true);
+    setPageError("");
+    try {
+      await signOut();
+    } catch (error) {
+      setPageError(error?.message || "Tidak dapat keluar dari akun. Coba lagi.");
+      setSigningOut(false);
+    }
+  };
 
   const displayName = profile?.full_name || "Siswa";
   const email = user?.email || "Email tidak tersedia";
@@ -233,6 +254,9 @@ export default function DashboardPage() {
       </> : <>
         <span className="student-brand-icon" aria-label="Logo SekolahKu"><GraduationCap size={22}/></span>
         <div className="student-header-title"><strong>SekolahKu</strong><small>RUANG BELAJAR SISWA</small></div>
+        {page === "Profile siswa" && <button className="student-header-logout" type="button" onClick={handleSignOut} disabled={signingOut}>
+          <LogOut size={16}/><span>{signingOut ? "Keluar..." : "Logout"}</span>
+        </button>}
       </>}
     </header>
 
