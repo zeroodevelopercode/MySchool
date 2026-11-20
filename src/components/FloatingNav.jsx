@@ -10,9 +10,9 @@ export const TABS = [
 ];
 
 const ACTIONS = [
-  { id: "Kelola guru", label: "Kelola guru", icon: Users },
-  { id: "Handle absensi murid", label: "Handle absensi murid", icon: ClipboardList },
-  { id: "Sampaikan pengumuman", label: "Sampaikan pengumuman", icon: Megaphone }
+  { id: "Kelola guru", label: "Kelola guru", shortLabel: "Guru", icon: Users },
+  { id: "Handle absensi murid", label: "Handle absensi murid", shortLabel: "Absensi murid", icon: ClipboardList },
+  { id: "Sampaikan pengumuman", label: "Sampaikan pengumuman", shortLabel: "Pengumuman", icon: Megaphone }
 ];
 
 const H = 64, CORNER = 17, DEPTH = 29, PAD = 9, NOTCH = 43;
@@ -93,10 +93,10 @@ export default function FloatingNav({ active, onChange, hidden = false, role = "
         </div>
         {canManage && <AnimatePresence>
           {actionOpen && <motion.div className="nv-actions" initial={{ opacity: 0, y: 12, scale: .82 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 10, scale: .82 }} transition={{ type: "spring", stiffness: 420, damping: 28 }}>
-            {ACTIONS.map(({ id, label, icon: Icon }, index) => <motion.button key={id} type="button" className={"nv-action-bubble nv-action-" + index}
+            {ACTIONS.map(({ id, label, shortLabel, icon: Icon }, index) => <motion.button key={id} type="button" className={"nv-action-bubble nv-action-" + index}
               initial={{ opacity: 0, scale: .5, y: 10 }} animate={{ opacity: 1, scale: 1, y: 0, transition: { delay: index * .055 } }}
               exit={{ opacity: 0, scale: .6, y: 8 }} onClick={() => selectAction(id)} aria-label={label}>
-              <span><Icon size={19}/></span><small>{label}</small>
+              <small>{shortLabel}</small><span><Icon size={19}/></span>
             </motion.button>)}
           </motion.div>}
         </AnimatePresence>}
