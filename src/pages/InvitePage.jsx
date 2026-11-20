@@ -21,7 +21,7 @@ export default function InvitePage({ classId }) {
       setLoading(false);
     })();
     return () => { active = false; };
-  }, [classId]);
+  }, [classId, user?.id]);
 
   const acceptInvite = async () => {
     if (!user?.id) {
@@ -44,11 +44,11 @@ export default function InvitePage({ classId }) {
       <div className="student-invite-mark"><GraduationCap size={29}/></div>
       <small>SEKOLAHKU • CLASS INVITATION</small>
       <h1>Accept invite to class</h1>
-      {loading ? <p><LoaderCircle size={17}/> Memeriksa undangan...</p> : error && !invite ? <p>{error}</p> : <>
+      {loading ? <p><LoaderCircle size={17}/> Memeriksa undangan...</p> : !user ? <><p>Masuk ke SekolahKu terlebih dahulu untuk melihat detail dan menerima undangan kelas ini.</p><button className="student-invite-action" onClick={acceptInvite} disabled={busy}>Continue with Google</button></> : error && !invite ? <p>{error}</p> : <>
         <p>Kamu diundang untuk bergabung ke kelas berikut. Pastikan kamu masuk menggunakan akun murid yang benar.</p>
         <div className="student-invite-class"><small>NAMA KELAS</small><strong>{invite?.class_name}</strong></div>
         {invite?.homeroom_teacher && <p>Wali kelas: <strong>{invite.homeroom_teacher}</strong></p>}
-        {!user ? <button className="student-invite-action" onClick={acceptInvite} disabled={busy}>Login untuk menerima undangan</button> : <button className="student-invite-action" onClick={acceptInvite} disabled={busy || profile?.role !== "student"}>{busy ? "Memproses..." : notice ? "Undangan diterima" : "Accept invite to class"}</button>}
+        {<button className="student-invite-action" onClick={acceptInvite} disabled={busy || profile?.role !== "student"}>{busy ? "Memproses..." : notice ? "Undangan diterima" : "Accept invite to class"}</button>}
         {profile && profile.role !== "student" && <p className="student-invite-note">Akun dengan role {profile.role} tidak dapat bergabung sebagai murid.</p>}
         {notice && <p className="student-form-success"><CheckCircle2 size={15}/> {notice}</p>}
         {error && <p className="student-form-error">{error}</p>}
