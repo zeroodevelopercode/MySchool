@@ -314,9 +314,10 @@
 }
 
 
-/* Pin management actions to the viewport center so they stay clustered around the Plus button */
+/* Keep action bubbles centered on the navbar's actual Plus slot */
 @media(max-width:899px){
- .nv-actions{position:fixed;left:50vw;right:auto;top:auto;bottom:184px;transform:translateX(-50%);width:180px;height:132px}
+ .nv-wrap{position:relative}
+ .nv-actions{position:absolute;left:50%;right:auto;top:auto;bottom:125px;transform:translateX(-50%);width:180px;height:132px}
  .nv-action-0{left:0;right:auto;top:58px}
  .nv-action-1{left:calc(50% - 33px);right:auto;top:0}
  .nv-action-2{left:auto;right:0;top:58px}
