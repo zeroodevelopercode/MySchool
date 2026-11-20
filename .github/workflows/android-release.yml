@@ -89,6 +89,21 @@ jobs:
           PY
           npx cap sync android
 
+      - name: Install native APK updater
+        run: |
+          mkdir -p android/app/src/main/java/com/zeroodev/sekolahku
+          cp android-native/src/main/java/com/zeroodev/sekolahku/*.java android/app/src/main/java/com/zeroodev/sekolahku/
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path("android/app/src/main/AndroidManifest.xml")
+          s = p.read_text()
+          permission = '    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />'
+          if "android.permission.REQUEST_INSTALL_PACKAGES" not in s:
+              marker = "<application"
+              s = s.replace(marker, permission + "\\n    " + marker, 1)
+          p.write_text(s)
+          PY
+
       - name: Build APK
         run: |
           cd android
