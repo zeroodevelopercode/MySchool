@@ -1,0 +1,102 @@
+name: Build SekolahKu Android APK
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "public/.well-known/assetlinks.json"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Restore Android debug signing key
+        uses: actions/cache@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: sekolahku-android-debug-keystore-v1
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build web app
+        run: npm run build
+
+      - name: Generate Android project
+        run: npx cap add android
+
+      - name: Configure verified Android App Links
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path("android/app/src/main/AndroidManifest.xml")
+          s = p.read_text()
+          marker = '<intent-filter android:autoVerify="true">\n                <action android:name="android.intent.action.VIEW" />\n                <category android:name="android.intent.category.DEFAULT" />\n                <category android:name="android.intent.category.BROWSABLE" />\n                <data android:scheme="https" android:host="myschool-umber.vercel.app" android:pathPrefix="/" />\n            </intent-filter>'
+          needle = '<activity'
+          start = s.find(needle)
+          end = s.find('>', start)
+          s = s[:end+1] + '\n            ' + marker + s[end+1:]
+          p.write_text(s)
+          PY
+          npx cap sync android
+
+      - name: Build APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: Publish APK
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p release
+          cp android/app/build/outputs/apk/debug/app-debug.apk release/SekolahKu.apk
+          gh release create android-build-${{ github.run_number }} release/SekolahKu.apk \
+            --title "SekolahKu Android build ${{ github.run_number }}" \
+            --notes "Build otomatis dari commit ${{ github.sha }}. Untuk pengujian Android."
+
+      - name: Publish signing fingerprint for App Links
+        run: |
+          mkdir -p public/.well-known
+          keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android 2>/dev/null | awk -F': ' '/SHA256:/{print $2; exit}' > /tmp/sha256
+          FINGERPRINT=$(cat /tmp/sha256 | tr -d ':')
+          python3 - <<'PY'
+          import json, os
+          fingerprint = os.environ["FINGERPRINT"]
+          data = [{
+            "relation": ["delegate_permission/common.handle_all_urls"],
+            "target": {
+              "namespace": "android_app",
+              "package_name": "com.zeroodev.sekolahku",
+              "sha256_cert_fingerprints": [":".join(fingerprint[i:i+2] for i in range(0, len(fingerprint), 2))]
+            }
+          }]
+          with open("public/.well-known/assetlinks.json", "w") as f:
+            json.dump(data, f, indent=2)
+          PY
+        env:
+          FINGERPRINT: ${{ env.FINGERPRINT }}
+
+      - name: Commit App Links verification file
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/.well-known/assetlinks.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Publish Android App Links signing fingerprint"
+            git push
+          fi
