@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.zeroodev.sekolahku",
+      "sha256_cert_fingerprints": [
+        "D2:10:15:13:59:54:DC:68:E5:5E:13:C6:3E:A4:F9:BF:D5:F3:11:F0:71:CC:6A:D0:07:BA:3F:F0:D3:98:4C:02"
+      ]
+    }
+  }
+]
