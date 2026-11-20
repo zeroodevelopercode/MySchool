@@ -12,8 +12,8 @@ export const TABS = [
 const ACTIONS = [
   { id: "Kelola guru", label: "Kelola guru", shortLabel: "Guru", icon: Users },
   { id: "Handle absensi murid", label: "Handle absensi murid", shortLabel: "Absensi murid", icon: ClipboardList },
-  { id: "Sampaikan pengumuman", label: "Sampaikan pengumuman", shortLabel: "Pengumuman", icon: Megaphone },
-  { id: "Manage class", label: "Manage class", shortLabel: "Kelas", icon: School }
+  { id: "Manage class", label: "Manage class", shortLabel: "Kelas", icon: School },
+  { id: "Sampaikan pengumuman", label: "Sampaikan pengumuman", shortLabel: "Pengumuman", icon: Megaphone }
 ];
 
 const H = 64, CORNER = 17, DEPTH = 29, PAD = 9, NOTCH = 43;
