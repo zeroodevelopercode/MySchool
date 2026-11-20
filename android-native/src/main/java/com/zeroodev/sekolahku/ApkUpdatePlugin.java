@@ -1,0 +1,124 @@
+package com.zeroodev.sekolahku;
+
+import android.app.DownloadManager;
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
+import android.provider.Settings;
+import android.database.Cursor;
+
+import com.getcapacitor.JSObject;
+import com.getcapacitor.Plugin;
+import com.getcapacitor.PluginCall;
+import com.getcapacitor.PluginMethod;
+import com.getcapacitor.annotation.CapacitorPlugin;
+
+@CapacitorPlugin(name = "ApkUpdate")
+public class ApkUpdatePlugin extends Plugin {
+    private final Handler handler = new Handler(Looper.getMainLooper());
+    private DownloadManager manager;
+
+    @PluginMethod
+    public void downloadAndInstall(PluginCall call) {
+        manager = (DownloadManager) getContext().getSystemService(Context.DOWNLOAD_SERVICE);
+        long savedId = getContext().getSharedPreferences("sekolahku_updates", Context.MODE_PRIVATE).getLong("download_id", -1L);
+        if (savedId > 0 && isDownloadSuccessful(savedId)) {
+            installOrRequestPermission(savedId, call);
+            return;
+        }
+
+        String url = call.getString("url");
+        if (url == null || !url.startsWith("https://")) {
+            call.reject("URL APK tidak valid.");
+            return;
+        }
+
+        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+        request.setTitle("Pembaruan SekolahKu");
+        request.setDescription("Mengunduh APK versi terbaru...");
+        request.setMimeType("application/vnd.android.package-archive");
+        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE);
+        request.setAllowedOverMetered(true);
+        request.setAllowedOverRoaming(false);
+        request.setDestinationInExternalFilesDir(getContext(), Environment.DIRECTORY_DOWNLOADS, "SekolahKu-update.apk");
+        long id = manager.enqueue(request);
+        getContext().getSharedPreferences("sekolahku_updates", Context.MODE_PRIVATE).edit().putLong("download_id", id).apply();
+        pollDownload(id, call);
+    }
+
+    private boolean isDownloadSuccessful(long id) {
+        DownloadManager.Query query = new DownloadManager.Query().setFilterById(id);
+        try (Cursor cursor = manager.query(query)) {
+            return cursor != null && cursor.moveToFirst()
+                && cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_SUCCESSFUL;
+        } catch (Exception ignored) {
+            return false;
+        }
+    }
+
+    private void pollDownload(long id, PluginCall call) {
+        Runnable poller = new Runnable() {
+            @Override public void run() {
+                DownloadManager.Query query = new DownloadManager.Query().setFilterById(id);
+                try (Cursor cursor = manager.query(query)) {
+                    if (cursor == null || !cursor.moveToFirst()) {
+                        call.reject("Unduhan pembaruan tidak ditemukan.");
+                        return;
+                    }
+                    int status = cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS));
+                    long total = cursor.getLong(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
+                    long downloaded = cursor.getLong(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
+                    JSObject progress = new JSObject();
+                    progress.put("downloaded", downloaded);
+                    progress.put("total", total);
+                    progress.put("percent", total > 0 ? Math.min(100, (int) (downloaded * 100 / total)) : 0);
+                    notifyListeners("downloadProgress", progress);
+
+                    if (status == DownloadManager.STATUS_SUCCESSFUL) {
+                        installOrRequestPermission(id, call);
+                    } else if (status == DownloadManager.STATUS_FAILED) {
+                        int reason = cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_REASON));
+                        call.reject("Unduhan APK gagal. Kode: " + reason);
+                    } else {
+                        handler.postDelayed(this, 450);
+                    }
+                } catch (Exception error) {
+                    call.reject("Gagal memeriksa unduhan: " + error.getMessage());
+                }
+            }
+        };
+        handler.post(poller);
+    }
+
+    private void installOrRequestPermission(long id, PluginCall call) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && !getContext().getPackageManager().canRequestPackageInstalls()) {
+            Intent settings = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
+                Uri.parse("package:" + getContext().getPackageName()));
+            settings.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            getContext().startActivity(settings);
+            JSObject result = new JSObject();
+            result.put("permissionRequired", true);
+            call.resolve(result);
+            return;
+        }
+
+        Uri apkUri = manager.getUriForDownloadedFile(id);
+        if (apkUri == null) {
+            call.reject("File APK hasil unduhan tidak tersedia.");
+            return;
+        }
+        Intent install = new Intent(Intent.ACTION_VIEW);
+        install.setDataAndType(apkUri, "application/vnd.android.package-archive");
+        install.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        try {
+            getContext().startActivity(install);
+            call.resolve();
+        } catch (Exception error) {
+            call.reject("Android tidak dapat membuka Package Installer: " + error.getMessage());
+        }
+    }
+}
