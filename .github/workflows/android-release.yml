@@ -125,13 +125,28 @@ jobs:
           start = match.end()
           end = g.find("}", start)
           block = g[start:end]
-          build = os.environ["BUILD_NUMBER"]
+          build = int(os.environ["BUILD_NUMBER"])
+          # Build 43 is the existing 1.0 baseline. Each subsequent build
+          # advances one minor version: 1.1 ... 1.9, then 2.0, etc.
+          version_step = max(0, build - 43)
+          version_name = f"{1 + version_step // 10}.{version_step % 10}"
+          build_code = str(build)
+
           if re.search(r"versionCode\s+\d+", block):
-              block = re.sub(r"versionCode\s+\d+", "versionCode " + build, block, count=1)
+              block = re.sub(r"versionCode\s+\d+", "versionCode " + build_code, block, count=1)
           elif "versionCode(" in block:
-              block = re.sub(r"versionCode\(\d+\)", "versionCode(" + build + ")", block, count=1)
+              block = re.sub(r"versionCode\(\d+\)", "versionCode(" + build_code + ")", block, count=1)
           else:
-              block = "\n        versionCode " + build + block
+              block = "\n        versionCode " + build_code + block
+
+          if re.search(r'versionName\s+["\'][^"\']+["\']', block):
+              block = re.sub(r'versionName\s+["\'][^"\']+["\']', 'versionName "' + version_name + '"', block, count=1)
+          elif re.search(r'versionName\(["\'][^"\']+["\']\)', block):
+              block = re.sub(r'versionName\(["\'][^"\']+["\']\)', 'versionName("' + version_name + '")', block, count=1)
+          else:
+              block = '\n        versionName "' + version_name + '"' + block
+
+          print(f"Android version: {version_name} (versionCode {build_code})")
           gradle.write_text(g[:start] + block + g[end:])
           PY
 
