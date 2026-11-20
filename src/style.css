@@ -181,3 +181,75 @@
 .student-header-title strong{font-size:16px;font-weight:800;letter-spacing:-.3px;color:#25283e}
 .student-header-title small{font-size:8px;letter-spacing:1.1px;color:#a0a4b2;font-weight:700}
 .student-brand-icon{flex:none}
+
+
+/* Student class overview and teacher announcements */
+.student-class-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:22px}
+.student-info-card{min-width:0;min-height:174px;background:#fff;border:1px solid #eceef4;border-radius:16px;padding:17px 18px;box-shadow:0 5px 18px rgba(38,35,94,.025)}
+.student-info-card-head{display:flex;align-items:center;gap:11px;margin-bottom:17px}
+.student-info-card-head>div{min-width:0}
+.student-info-card-head>div>span,.student-announcement-intro>div>span{display:block;font-size:8px;letter-spacing:1px;font-weight:800;color:#a0a4b2}
+.student-info-card-head h2{font-size:13px;letter-spacing:-.2px;margin:4px 0 0}
+.student-info-icon{width:39px;height:39px;flex:none;border-radius:12px;display:grid;place-items:center}
+.student-info-icon.classmates{background:#eeedff;color:#625ce9}
+.student-info-icon.classroom{background:#eaf3ff;color:#5794df}
+.student-classmate-list{display:grid;gap:9px}
+.student-classmate{display:flex;align-items:center;gap:8px;min-width:0;font-size:10px;font-weight:650;color:#4d5268}
+.student-classmate>span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.student-mini-avatar{width:25px;height:25px;flex:none;overflow:hidden;border-radius:9px;display:grid;place-items:center;background:#f0efff;color:#625ce9;font-size:8px;font-weight:800}
+.student-mini-avatar img{width:100%;height:100%;object-fit:cover}
+.student-card-muted{font-size:10px;line-height:1.7;color:#999eae;margin:0}
+.student-card-foot{display:block;font-size:9px;color:#7772df;font-weight:700;margin:9px 0 0 33px}
+.student-class-name{display:inline-flex;align-items:center;min-height:39px;padding:8px 13px;border-radius:11px;background:#f0efff;color:#514be8;font-size:20px;font-weight:800;letter-spacing:-.5px}
+.student-class-error{font-size:10px;color:#bd505b;margin:9px 2px 0}
+.student-notification-card{width:100%;min-height:78px;margin-top:13px;padding:13px 17px;display:flex;align-items:center;gap:13px;text-align:left;background:#fff;border:1px solid #eceef4;border-radius:15px;transition:transform .2s,border-color .2s,box-shadow .2s}
+.student-notification-card:hover{transform:translateY(-2px);border-color:#d8d6ff;box-shadow:0 10px 24px rgba(38,35,94,.07)}
+.student-notification-icon{width:42px;height:42px;flex:none;display:grid;place-items:center;border-radius:13px;background:#fff3e9;color:#e79a59}
+.student-notification-copy{display:flex;flex:1;min-width:0;flex-direction:column;gap:5px}
+.student-notification-copy strong{font-size:12px;color:#34384d}
+.student-notification-copy small{font-size:10px;color:#a0a4b2;white-space:normal}
+.student-notification-count{min-width:23px;height:23px;padding:0 6px;display:grid;place-items:center;border-radius:20px;background:#eeedff;color:#514be8;font-size:9px;font-weight:800}
+.student-notification-arrow{font-size:25px;line-height:1;color:#a0a4b2;margin-left:3px}
+.student-detail-topbar{justify-content:center}
+.student-back-button{position:absolute;left:clamp(16px,5vw,72px);width:38px;height:38px;border:1px solid #eceef4;background:#fff;color:#555b70;border-radius:11px;display:grid;place-items:center;transition:background .2s,color .2s}
+.student-back-button:hover{background:#f2f1ff;color:#514be8}
+.student-announcements-page{max-width:850px;margin:0 auto}
+.student-announcement-intro{display:flex;align-items:center;gap:13px;margin-bottom:23px}
+.student-announcement-intro h1{font-size:23px;letter-spacing:-.7px;margin:4px 0}
+.student-announcement-intro p{font-size:10px;line-height:1.6;color:#969bad;margin:0}
+.student-announcement-empty{min-height:270px;padding:30px;background:#fff;border:1px solid #eceef4;border-radius:17px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#7772df}
+.student-announcement-empty h2{font-size:15px;color:#41455a;margin:14px 0 5px}
+.student-announcement-empty p{max-width:370px;font-size:10px;line-height:1.8;color:#999eae;margin:0}
+.student-announcement-list{display:grid;gap:12px}
+.student-announcement{background:#fff;border:1px solid #eceef4;border-radius:15px;padding:19px 21px}
+.student-announcement-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:13px}
+.student-announcement-tag{display:inline-flex;align-items:center;gap:6px;color:#625ce9;background:#f0efff;border-radius:20px;padding:6px 9px;font-size:9px;font-weight:700}
+.student-announcement time{font-size:9px;color:#a0a4b2;text-align:right}
+.student-announcement h2{font-size:15px;line-height:1.4;color:#34384d;margin:0 0 8px}
+.student-announcement>p{font-size:11px;line-height:1.85;color:#777d90;white-space:pre-wrap;overflow-wrap:anywhere;margin:0}
+@media(max-width:650px){
+ .student-class-grid{gap:9px;margin-top:17px}
+ .student-info-card{min-height:165px;padding:13px 12px;border-radius:13px}
+ .student-info-card-head{align-items:flex-start;gap:8px;margin-bottom:13px}
+ .student-info-icon{width:32px;height:32px;border-radius:10px}
+ .student-info-icon svg{width:17px;height:17px}
+ .student-info-card-head>div>span{font-size:7px;letter-spacing:.65px}
+ .student-info-card-head h2{font-size:11px}
+ .student-classmate{font-size:9px;gap:6px}
+ .student-mini-avatar{width:22px;height:22px}
+ .student-class-name{font-size:17px;min-height:34px;padding:7px 10px}
+ .student-card-muted{font-size:9px;line-height:1.65}
+ .student-notification-card{min-height:70px;padding:11px 13px;gap:10px}
+ .student-notification-icon{width:37px;height:37px}
+ .student-notification-copy strong{font-size:11px}
+ .student-notification-copy small{font-size:9px}
+ .student-announcement-intro h1{font-size:20px}
+ .student-announcement{padding:16px}
+ .student-announcement-top{align-items:flex-start;flex-direction:column;gap:8px}
+ .student-announcement time{text-align:left}
+}
+@media(max-width:360px){
+ .student-info-card{padding:11px 9px}
+ .student-info-card-head{gap:6px}
+ .student-info-card-head h2{font-size:10px}
+}
