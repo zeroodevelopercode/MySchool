@@ -25,13 +25,8 @@ public class ApkUpdatePlugin extends Plugin {
     @PluginMethod
     public void downloadAndInstall(PluginCall call) {
         manager = (DownloadManager) getContext().getSystemService(Context.DOWNLOAD_SERVICE);
-        long savedId = getContext().getSharedPreferences("sekolahku_updates", Context.MODE_PRIVATE).getLong("download_id", -1L);
-        if (savedId > 0 && isDownloadSuccessful(savedId)) {
-            installOrRequestPermission(savedId);
-            call.resolve();
-            return;
-        }
-
+        // Always fetch the exact APK URL supplied by the current update check.
+        // Reusing a previous successful DownloadManager ID can reinstall a stale APK.
         String url = call.getString("url");
         if (url == null || !url.startsWith("https://")) {
             call.reject("URL APK tidak valid.");
@@ -45,9 +40,9 @@ public class ApkUpdatePlugin extends Plugin {
         request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE);
         request.setAllowedOverMetered(true);
         request.setAllowedOverRoaming(false);
-        request.setDestinationInExternalFilesDir(getContext(), Environment.DIRECTORY_DOWNLOADS, "SekolahKu-update.apk");
+        String fileName = "SekolahKu-update-" + System.currentTimeMillis() + ".apk";
+        request.setDestinationInExternalFilesDir(getContext(), Environment.DIRECTORY_DOWNLOADS, fileName);
         long id = manager.enqueue(request);
-        getContext().getSharedPreferences("sekolahku_updates", Context.MODE_PRIVATE).edit().putLong("download_id", id).apply();
         call.resolve();
         pollDownload(id);
     }
