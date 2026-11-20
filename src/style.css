@@ -49,3 +49,67 @@
 .onboarding-footer span{color:#b5b8c3}
 @media(max-width:520px){.onboarding-screen{justify-content:center;padding:78px 16px 65px}.onboarding-brand{top:18px;left:18px}.onboarding-card{padding:27px 22px;border-radius:19px}.onboarding-card h1{font-size:25px}.onboarding-footer{bottom:14px;font-size:9px}}
 @media(prefers-reduced-motion:reduce){.onboarding-card{animation:none}}
+
+
+/* Student workspace: floating navigation, no sidebar or demo content */
+.student-app{min-height:100svh;background:#f7f8fc;color:#25283e;padding-bottom:112px}
+.student-topbar{height:72px;padding:0 clamp(18px,5vw,72px);display:flex;align-items:center;justify-content:space-between;background:#fff;border-bottom:1px solid #eceef4}
+.student-brand{display:flex;align-items:center;gap:10px;font-size:16px;font-weight:800;letter-spacing:-.3px}
+.student-brand>span:last-child{display:flex;flex-direction:column;gap:2px}
+.student-brand small{font-size:8px;letter-spacing:1.1px;color:#a0a4b2;font-weight:700}
+.student-brand-icon{width:38px;height:38px;border-radius:12px;background:#514be8;color:white;display:grid;place-items:center}
+.student-logout{display:flex;align-items:center;gap:8px;border:1px solid #eceef4;background:white;color:#777d90;padding:9px 13px;border-radius:10px;font-size:11px;transition:.2s}
+.student-logout:hover{color:#d35f65;border-color:#f2d9dc;background:#fffafa}
+.student-logout:disabled{opacity:.55;cursor:wait}
+.student-main{width:min(100% - 40px,1040px);margin:0 auto;padding:40px 0 28px;animation:pageIn .3s ease both}
+.student-hero{position:relative;overflow:hidden;border-radius:20px;background:linear-gradient(115deg,#514be8,#7772ef);color:white;padding:36px 40px;min-height:205px}
+.student-eyebrow,.student-section-title>div>span,.student-page-heading>div>span{font-size:9px;font-weight:800;letter-spacing:1.3px;opacity:.72}
+.student-hero h1{font-size:clamp(27px,4vw,36px);letter-spacing:-1.2px;margin:12px 0 7px}
+.student-hero p{font-size:12px;line-height:1.7;color:#e4e3ff;max-width:470px;margin:0}
+.student-hero-mark{position:absolute;right:55px;top:50%;transform:translateY(-50%);width:104px;height:104px;border:1px solid #ffffff35;background:#ffffff18;border-radius:30px;display:grid;place-items:center;color:#fff}
+.student-section-title{display:flex;align-items:center;justify-content:space-between;margin:30px 0 14px}
+.student-section-title>div>span{color:#a1a5b4;opacity:1}
+.student-section-title h2{font-size:18px;margin:5px 0 0}
+.student-shortcuts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.student-shortcuts button{border:1px solid #eceef4;background:white;border-radius:15px;padding:20px;text-align:left;display:flex;flex-direction:column;align-items:flex-start;transition:transform .2s,border-color .2s,box-shadow .2s}
+.student-shortcuts button:hover{transform:translateY(-3px);border-color:#d8d6ff;box-shadow:0 12px 28px #34346b0c}
+.shortcut-icon,.student-page-icon{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;margin-bottom:14px}
+.shortcut-icon.violet,.student-page-icon.violet{background:#eeedff;color:#514be8}
+.shortcut-icon.blue,.student-page-icon.blue{background:#eaf3ff;color:#5794df}
+.shortcut-icon.green,.student-page-icon.green{background:#e9f8f0;color:#42a879}
+.student-shortcuts strong{font-size:12px}
+.student-shortcuts small{font-size:10px;color:#a0a4b2;margin-top:5px}
+.student-empty-home{display:flex;align-items:flex-start;gap:13px;background:#fff;border:1px dashed #dedff0;border-radius:14px;padding:19px 21px;margin-top:17px;color:#7772df}
+.student-empty-home strong{font-size:12px;color:#41455a}
+.student-empty-home p{font-size:10px;color:#999eae;line-height:1.7;margin:5px 0 0}
+.student-page{animation:pageIn .3s ease both}
+.student-page-heading{display:flex;align-items:center;gap:14px;margin-bottom:24px}
+.student-page-icon{width:48px;height:48px;margin:0}
+.student-page-heading>div>span{color:#a1a5b4;opacity:1}
+.student-page-heading h1{font-size:25px;letter-spacing:-.7px;margin:4px 0 0}
+.student-empty-state{min-height:320px;background:#fff;border:1px solid #eceef4;border-radius:17px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px 24px}
+.empty-state-icon{width:62px;height:62px;border-radius:19px;background:#f1f0ff;color:#625de5;display:grid;place-items:center;margin-bottom:17px}
+.student-empty-state h2{font-size:17px;margin:0}
+.student-empty-state p{max-width:420px;font-size:11px;line-height:1.8;color:#969bad;margin:9px 0 16px}
+.student-feature-tag{display:inline-flex;align-items:center;gap:6px;border-radius:30px;background:#f4f3ff;color:#716be2;padding:8px 11px;font-size:9px;font-weight:700}
+.student-staff-note{font-size:10px;line-height:1.7;color:#9a9eae;margin:13px 2px}
+.student-profile-card{background:white;border:1px solid #eceef4;border-radius:17px;padding:25px 28px;max-width:760px}
+.student-profile-head{display:flex;align-items:center;gap:14px;padding-bottom:22px;border-bottom:1px solid #f0f1f5}
+.student-avatar{width:56px;height:56px;flex:none;border-radius:17px;background:#eeedff;color:#514be8;display:grid;place-items:center;font-size:16px;font-weight:800;overflow:hidden}
+.student-avatar img{width:100%;height:100%;object-fit:cover}
+.student-profile-head h2{font-size:16px;margin:0}
+.student-profile-head span{display:block;font-size:10px;color:#a0a4b2;margin-top:5px}
+.student-profile-details{display:grid;grid-template-columns:1fr 1fr;gap:0 24px}
+.student-profile-details>div{display:flex;flex-direction:column;gap:8px;padding:17px 0;border-bottom:1px solid #f0f1f5;min-width:0}
+.student-profile-details>div>span{display:flex;align-items:center;gap:7px;font-size:10px;color:#999eae}
+.student-profile-details>div>strong{font-size:11px;color:#3e4256;overflow-wrap:anywhere}
+.student-profile-details .student-email{color:#514be8}
+.student-profile-note{font-size:10px;color:#a0a4b2;line-height:1.7;margin:18px 0 0}
+.student-notice{max-width:760px;padding:11px 14px;border-radius:9px;background:#fff0f1;color:#bd505b;font-size:11px}
+.floating-student-nav{position:fixed;z-index:20;bottom:22px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:5px;padding:7px;background:#fff;border:1px solid #ececf4;border-radius:17px;box-shadow:0 14px 45px #24264a20;max-width:calc(100vw - 28px)}
+.floating-student-nav button{min-width:94px;border:0;background:transparent;color:#969bad;border-radius:12px;padding:10px 13px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;font-size:9px;font-weight:600;white-space:nowrap;transition:background .2s,color .2s,transform .2s}
+.floating-student-nav button:hover{background:#f7f6ff;color:#625de5}
+.floating-student-nav button:active{transform:scale(.96)}
+.floating-student-nav button.selected{background:#eeedff;color:#514be8;font-weight:800}
+@media(max-width:650px){.student-app{padding-bottom:102px}.student-topbar{height:62px;padding:0 16px}.student-main{width:calc(100% - 30px);padding:24px 0}.student-hero{padding:27px 23px;min-height:178px;border-radius:16px}.student-hero-mark{right:20px;width:65px;height:65px;border-radius:20px;opacity:.75}.student-hero-mark svg{width:27px}.student-hero p{max-width:75%;font-size:11px}.student-shortcuts{grid-template-columns:1fr;gap:9px}.student-shortcuts button{display:grid;grid-template-columns:42px 1fr;grid-template-rows:auto auto;column-gap:13px;padding:13px 15px;align-items:center}.student-shortcuts .shortcut-icon{grid-row:1/3;margin:0}.student-shortcuts strong{align-self:end}.student-shortcuts small{align-self:start;margin-top:3px}.student-empty-home{padding:15px}.student-page-heading h1{font-size:22px}.student-profile-card{padding:19px 17px}.student-profile-details{grid-template-columns:1fr;}.student-profile-details>div{padding:13px 0}.floating-student-nav{bottom:12px;width:calc(100vw - 22px);justify-content:space-around;gap:1px;padding:6px;border-radius:16px}.floating-student-nav button{min-width:0;flex:1;padding:9px 3px;font-size:8px}.floating-student-nav button svg{width:18px;height:18px}}
+@media(prefers-reduced-motion:reduce){.student-shortcuts button,.floating-student-nav button{transition:none}}
