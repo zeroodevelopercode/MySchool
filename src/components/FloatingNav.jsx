@@ -86,9 +86,9 @@ export default function FloatingNav({ active, onChange, hidden = false, role = "
               <motion.span className="nv-icon" initial={false}
                 animate={{ y: selected ? -29 : 0, scale: selected ? 1.12 : 1, rotate: isAction && actionOpen ? 45 : 0 }}
                 transition={{ type: "spring", ...SPRING }}>
-                {isAction ? (actionOpen ? <X size={21} strokeWidth={2.4}/> : <Plus size={22} strokeWidth={2.4}/>) : <Icon size={20} strokeWidth={2.1}/>}
+                {isAction ? (actionOpen ? <School size={21} strokeWidth={2.3}/> : <Plus size={22} strokeWidth={2.4}/>) : <Icon size={20} strokeWidth={2.1}/>}
               </motion.span>
-              <span className="nv-label">{isAction ? "Aksi" : label}</span>
+              <span className="nv-label">{isAction ? (actionOpen ? "Kelas" : "Plus") : label}</span>
             </button>;
           })}
         </div>
