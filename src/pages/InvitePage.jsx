@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { GraduationCap, School, CheckCircle2, LoaderCircle, ArrowLeft } from "lucide-react";
+import { GraduationCap, CheckCircle2, LoaderCircle } from "lucide-react";
 import { useAuth } from "../auth/AuthProvider.jsx";
 import { supabase } from "../lib/supabase.js";
 
