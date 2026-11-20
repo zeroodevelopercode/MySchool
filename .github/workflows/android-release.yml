@@ -100,7 +100,7 @@ jobs:
           permission = '    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />'
           if "android.permission.REQUEST_INSTALL_PACKAGES" not in s:
               marker = "<application"
-              s = s.replace(marker, permission + "\\n    " + marker, 1)
+              s = s.replace(marker, permission + "\n    " + marker, 1)
           p.write_text(s)
           PY
 
@@ -113,25 +113,25 @@ jobs:
           s = manifest.read_text()
           permission = '    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />'
           if "android.permission.REQUEST_INSTALL_PACKAGES" not in s:
-              s = s.replace("<application", permission + "\\n    <application", 1)
+              s = s.replace("<application", permission + "\n    <application", 1)
           manifest.write_text(s)
           gradle = Path("android/app/build.gradle")
           if not gradle.exists():
               gradle = Path("android/app/build.gradle.kts")
           g = gradle.read_text()
-          match = re.search(r"defaultConfig\\s*\\{", g)
+          match = re.search(r"defaultConfig\s*\{", g)
           if not match:
               raise SystemExit("defaultConfig block not found")
           start = match.end()
           end = g.find("}", start)
           block = g[start:end]
           build = os.environ["BUILD_NUMBER"]
-          if re.search(r"versionCode\\s+\\d+", block):
-              block = re.sub(r"versionCode\\s+\\d+", "versionCode " + build, block, count=1)
+          if re.search(r"versionCode\s+\d+", block):
+              block = re.sub(r"versionCode\s+\d+", "versionCode " + build, block, count=1)
           elif "versionCode(" in block:
-              block = re.sub(r"versionCode\\(\\d+\\)", "versionCode(" + build + ")", block, count=1)
+              block = re.sub(r"versionCode\(\d+\)", "versionCode(" + build + ")", block, count=1)
           else:
-              block = "\\n        versionCode " + build + block
+              block = "\n        versionCode " + build + block
           gradle.write_text(g[:start] + block + g[end:])
           PY
 
