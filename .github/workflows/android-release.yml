@@ -59,7 +59,7 @@ jobs:
           end = s.find(">", start)
           if start < 0 or end < 0:
               raise SystemExit("Main Android activity was not found")
-          s = s[:end + 1] + "\\n            " + marker + s[end + 1:]
+          s = s[:end + 1] + "\n            " + marker + s[end + 1:]
           p.write_text(s)
           PY
           npx cap sync android
