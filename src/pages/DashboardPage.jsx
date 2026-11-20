@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import FloatingNav from "../components/FloatingNav.jsx";
-import { Home, ClipboardCheck, CalendarDays, UserRound, GraduationCap, Clock3, Mail, Cake, Users, CalendarPlus, Bell, ArrowLeft, School, Megaphone, UserCog, CheckCircle2, Send, LoaderCircle } from "lucide-react";
+import { Home, ClipboardCheck, CalendarDays, UserRound, GraduationCap, Clock3, Mail, Cake, Users, CalendarPlus, Bell, ArrowLeft, School, Megaphone, UserCog, CheckCircle2, Send, LoaderCircle, MoreVertical, Copy, X, UserRound } from "lucide-react";
 import { useAuth } from "../auth/AuthProvider.jsx";
 import { supabase } from "../lib/supabase.js";
 
@@ -48,6 +48,11 @@ export default function DashboardPage() {
   const [announcementBody, setAnnouncementBody] = useState("");
   const [newClassName, setNewClassName] = useState("");
   const [saving, setSaving] = useState(false);
+  const [classMenuId, setClassMenuId] = useState("");
+  const [classDetail, setClassDetail] = useState(null);
+  const [classRoster, setClassRoster] = useState([]);
+  const [classTeacher, setClassTeacher] = useState(null);
+  const [classDetailLoading, setClassDetailLoading] = useState(false);
 
   const displayName = profile?.full_name || "Siswa";
   const email = user?.email || "Email tidak tersedia";
@@ -111,7 +116,7 @@ export default function DashboardPage() {
           setPageLoading(false);
         }
       } else if (["Handle absensi murid", "Sampaikan pengumuman", "Manage class"].includes(page)) {
-        const { data, error } = await supabase.from("classes").select("id,name").eq("created_by", user.id).order("name");
+        const { data, error } = await supabase.from("classes").select("id,name,created_by").order("name");
         if (active) {
           setStaffClasses(data || []);
           setPageError(error ? "Daftar kelas belum dapat dimuat." : "");
@@ -170,10 +175,41 @@ export default function DashboardPage() {
     const name = newClassName.trim();
     if (!name) return;
     setSaving(true); setPageError(""); setPageNotice("");
-    const { data, error } = await supabase.from("classes").insert({ name, created_by: user.id }).select("id,name").single();
+    const { data, error } = await supabase.from("classes").insert({ name, created_by: user.id }).select("id,name,created_by").single();
     setSaving(false);
     if (error) setPageError("Kelas gagal dibuat. Periksa izin pengelolaan kelas.");
     else { setStaffClasses((current) => [...current, data].sort((a,b) => a.name.localeCompare(b.name))); setSelectedClass(data.id); setNewClassName(""); setPageNotice("Kelas berhasil dibuat."); }
+  };
+
+  const showClassDetails = async (item, mode = "students") => {
+    setClassMenuId("");
+    setClassDetail({ ...item, mode });
+    setClassDetailLoading(true);
+    setClassRoster([]);
+    setClassTeacher(null);
+    const [membersResult, teacherResult] = await Promise.all([
+      supabase.from("class_members").select("student_id").eq("class_id", item.id),
+      supabase.from("profiles").select("id,full_name,avatar_url").eq("id", item.created_by).maybeSingle()
+    ]);
+    const studentIds = (membersResult.data || []).map((member) => member.student_id);
+    const studentsResult = studentIds.length
+      ? await supabase.from("profiles").select("id,full_name,avatar_url").in("id", studentIds).order("full_name")
+      : { data: [], error: null };
+    setClassRoster(studentsResult.data || []);
+    setClassTeacher(teacherResult.data || null);
+    setClassDetailLoading(false);
+    if (membersResult.error || studentsResult.error || teacherResult.error) setPageError("Sebagian informasi kelas belum dapat dimuat.");
+  };
+
+  const copyClassInvite = async (item) => {
+    const inviteUrl = window.location.origin + "/invite/" + item.id;
+    try {
+      await navigator.clipboard.writeText(inviteUrl);
+      setPageNotice("Link undangan " + item.name + " berhasil disalin.");
+    } catch {
+      setPageError("Browser tidak mengizinkan penyalinan otomatis. Salin link ini: " + inviteUrl);
+    }
+    setClassMenuId("");
   };
 
   const publishAnnouncement = async (event) => {
@@ -245,7 +281,8 @@ export default function DashboardPage() {
           <div className="student-form-field"><label htmlFor="new-class-name">Nama kelas</label><input id="new-class-name" value={newClassName} onChange={(e) => setNewClassName(e.target.value)} placeholder="Contoh: 7A, 8B, XII IPA 1" maxLength={60} required /></div>
           <button className="student-primary-action" type="submit" disabled={saving}>{saving ? "Menyimpan..." : "Buat kelas"}</button>
         </form>
-        <div className="student-teacher-list">{staffClasses.length ? staffClasses.map((item) => <article className="student-teacher-row" key={item.id}><span className="student-teacher-avatar"><School size={18}/></span><span><strong>{item.name}</strong><small>Kelas yang kamu kelola</small></span><span className="student-role-pill">KELAS</span></article>) : <div className="student-announcement-empty"><School size={25}/><h2>Belum ada kelas</h2><p>Buat kelas pertama untuk mulai mengelola siswa.</p></div>}</div>
+        <div className="student-teacher-list">{staffClasses.length ? staffClasses.map((item) => <article className="student-class-manage-row" key={item.id}><span className="student-teacher-avatar"><School size={18}/></span><span className="student-class-manage-copy"><strong>{item.name}</strong><small>Wali kelas: {item.created_by === user.id ? "Kamu" : "Lihat detail"}</small></span><span className="student-class-menu-wrap"><button type="button" className="student-class-menu-trigger" aria-label={"Menu kelas " + item.name} onClick={() => setClassMenuId((current) => current === item.id ? "" : item.id)}><MoreVertical size={19}/></button>{classMenuId === item.id && <div className="student-class-menu"><button onClick={() => showClassDetails(item, "students")}><Users size={15}/> Lihat semua murid</button><button onClick={() => showClassDetails(item, "teacher")}><UserRound size={15}/> Wali kelas</button><button onClick={() => copyClassInvite(item)}><Copy size={15}/> Copy link invite</button></div>}</span></article>) : <div className="student-announcement-empty"><School size={25}/><h2>Belum ada kelas</h2><p>Buat kelas pertama untuk mulai mengelola siswa.</p></div>}</div>
+        {classDetail && <div className="student-class-modal-backdrop" onClick={() => setClassDetail(null)}><section className="student-class-modal" role="dialog" aria-modal="true" aria-label={"Detail " + classDetail.name} onClick={(event) => event.stopPropagation()}><header><div><small>DETAIL KELAS</small><h2>{classDetail.name}</h2></div><button onClick={() => setClassDetail(null)} aria-label="Tutup"><X size={19}/></button></header>{classDetailLoading ? <p className="student-card-muted">Memuat informasi kelas...</p> : <><div className="student-class-teacher"><span className="student-info-icon classroom"><UserRound size={18}/></span><div><small>WALI KELAS</small><strong>{classTeacher?.full_name || "Data wali kelas tidak tersedia"}</strong></div></div>{classDetail.mode === "students" && <><div className="student-class-roster-heading"><strong>Semua murid</strong><span>{classRoster.length} murid</span></div>{classRoster.length ? <div className="student-class-roster">{classRoster.map((student) => <div className="student-class-roster-item" key={student.id}><span className="student-mini-avatar">{student.avatar_url ? <img src={student.avatar_url} alt=""/> : (student.full_name || "S").slice(0,1).toUpperCase()}</span><strong>{student.full_name || "Nama siswa"}</strong></div>)}</div> : <p className="student-card-muted">Belum ada murid yang bergabung.</p>}</>}</>}</section></div>}
         {pageNotice && <p className="student-form-success">{pageNotice}</p>}
         {pageError && <p className="student-form-error">{pageError}</p>}
       </section>}
