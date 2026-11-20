@@ -6,7 +6,24 @@
     <meta name="theme-color" content="#f8f9ff">
     <meta name="description" content="SekolahKu - portal belajar digital">
     <link rel="icon" href="/icon.svg">
+    <link rel="stylesheet" href="/src/style.css">
     <title>SekolahKu - Portal Sekolah</title>
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", async () => {
+          try {
+            const registrations = await navigator.serviceWorker.getRegistrations();
+            await Promise.all(registrations.map((registration) => registration.unregister()));
+            if ("caches" in window) {
+              const cacheNames = await caches.keys();
+              await Promise.all(cacheNames.map((cacheName) => caches.delete(cacheName)));
+            }
+          } catch (error) {
+            console.warn("Cache cleanup skipped:", error);
+          }
+        });
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
