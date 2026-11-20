@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import FloatingNav from "../components/FloatingNav.jsx";
-import { Home, ClipboardCheck, CalendarDays, UserRound, GraduationCap, Clock3, Mail, Cake, Users, CalendarPlus, Bell, ArrowLeft, School, Megaphone, UserCog, CheckCircle2, Send, LoaderCircle, MoreVertical, Copy, X, UserRound } from "lucide-react";
+import { Home, ClipboardCheck, CalendarDays, UserRound, GraduationCap, Clock3, Mail, Cake, Users, CalendarPlus, Bell, ArrowLeft, School, Megaphone, UserCog, CheckCircle2, Send, LoaderCircle, MoreVertical, Copy, X } from "lucide-react";
 import { useAuth } from "../auth/AuthProvider.jsx";
 import { supabase } from "../lib/supabase.js";
 
