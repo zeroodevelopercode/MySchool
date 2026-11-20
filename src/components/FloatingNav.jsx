@@ -91,7 +91,7 @@ export default function FloatingNav({ active, onChange, hidden = false }) {
               <button key={id} type="button" className="nv-item" aria-label={label}
                 aria-current={selected ? "page" : undefined} onClick={() => onChange(id)}>
                 <motion.span className="nv-icon" initial={false}
-                  animate={{ y: selected ? -27 : 0, x: selected && id === "Beranda" ? 2 : selected && id === "Profile siswa" ? -2 : 0, scale: selected ? 1.12 : 1 }}
+                  animate={{ y: selected ? -29 : 0, scale: selected ? 1.12 : 1 }}
                   transition={{ type: "spring", ...SPRING }}>
                   <Icon size={20} strokeWidth={2.1} />
                 </motion.span>
