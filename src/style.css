@@ -366,3 +366,9 @@
 .student-invite-action{width:100%;min-height:46px;margin-top:14px;border:0;border-radius:12px;background:linear-gradient(135deg,#716cf5,#5049df);color:#fff;font-size:11px;font-weight:800}
 .student-invite-action:disabled{opacity:.55;cursor:not-allowed}
 .student-invite-note{font-size:9px!important;color:#9da1af!important}
+
+@media(min-width:900px){
+ .nv-action-1{left:calc(50% - 74px);right:auto;top:0}
+ .nv-action-2{left:calc(50% + 8px);right:auto;top:0}
+ .nv-action-3{left:calc(50% - 33px);right:auto;top:116px}
+}
