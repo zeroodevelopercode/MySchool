@@ -56,22 +56,37 @@ function AppContent() {
     if (!Capacitor.isNativePlatform()) return;
     let active = true;
     const currentBuild = Number(import.meta.env.VITE_ANDROID_BUILD_NUMBER || 0);
-    fetch("https://api.github.com/repos/zeroodevelopercode/MySchool/releases/latest", {
+
+    fetch("https://api.github.com/repos/zeroodevelopercode/MySchool/releases?per_page=100", {
       headers: { Accept: "application/vnd.github+json" }
     })
       .then(response => {
         if (!response.ok) throw new Error("Gagal memeriksa versi aplikasi");
         return response.json();
       })
-      .then(release => {
-        const match = String(release.tag_name || "").match(/^android-build-(\d+)$/);
-        const latestBuild = match ? Number(match[1]) : 0;
-        const apk = release.assets?.find(asset => asset.name === "SekolahKu.apk");
-        if (active && latestBuild > currentBuild && apk) {
-          setAppUpdate({ version: latestBuild, url: apk.browser_download_url });
+      .then(releases => {
+        if (!Array.isArray(releases)) throw new Error("Format daftar release GitHub tidak valid");
+
+        // Pilih nomor build tertinggi, bukan mengandalkan urutan publikasi /releases/latest.
+        const candidates = releases
+          .filter(release => !release.draft)
+          .map(release => {
+            const match = String(release.tag_name || "").match(/^android-build-(\\d+)$/);
+            const apk = release.assets?.find(asset => asset.name === "SekolahKu.apk");
+            return match && apk
+              ? { version: Number(match[1]), url: apk.browser_download_url }
+              : null;
+          })
+          .filter(Boolean)
+          .sort((a, b) => b.version - a.version);
+
+        const latestBuild = candidates[0];
+        if (active && latestBuild && latestBuild.version > currentBuild) {
+          setAppUpdate(latestBuild);
         }
       })
       .catch(error => console.warn("Pemeriksaan update SekolahKu:", error));
+
     return () => { active = false; };
   }, []);
 
