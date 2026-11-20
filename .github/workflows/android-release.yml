@@ -34,6 +34,21 @@ jobs:
           path: ~/.android/debug.keystore
           key: sekolahku-android-debug-keystore-v1
 
+      - name: Ensure Android debug signing key
+        run: |
+          mkdir -p ~/.android
+          if [ ! -f ~/.android/debug.keystore ]; then
+            keytool -genkeypair -v \
+              -keystore ~/.android/debug.keystore \
+              -storepass android \
+              -alias androiddebugkey \
+              -keypass android \
+              -keyalg RSA \
+              -keysize 2048 \
+              -validity 10000 \
+              -dname "CN=Android Debug,O=Android,C=US"
+          fi
+
       - name: Install dependencies
         run: npm install
 
