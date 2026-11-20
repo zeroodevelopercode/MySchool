@@ -73,7 +73,7 @@ jobs:
         run: |
           mkdir -p public/.well-known
           keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android 2>/dev/null | awk -F': ' '/SHA256:/{print $2; exit}' > /tmp/sha256
-          FINGERPRINT=$(cat /tmp/sha256 | tr -d ':')
+          FINGERPRINT=$(cat /tmp/sha256 | tr -d ':')\n          echo "value=$FINGERPRINT" >> "$GITHUB_OUTPUT"
           python3 - <<'PY'
           import json, os
           fingerprint = os.environ["FINGERPRINT"]
