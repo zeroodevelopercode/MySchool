@@ -328,3 +328,41 @@
  .nv-actions{height:178px}
  .nv-action-3{left:calc(50% - 33px);right:auto;top:116px}
 }
+
+/* Class management menu, roster dialog, and invite page */
+.student-class-manage-row{position:relative;display:flex;align-items:center;gap:12px;min-height:67px;padding:12px 13px 12px 15px;background:#fff;border:1px solid #eceef4;border-radius:13px}
+.student-class-manage-copy{display:flex;flex:1;min-width:0;flex-direction:column;gap:4px}
+.student-class-manage-copy strong{font-size:11px;color:#34384d}
+.student-class-manage-copy small{font-size:9px;color:#a0a4b2}
+.student-class-menu-wrap{position:relative}
+.student-class-menu-trigger{width:36px;height:36px;border:0;border-radius:10px;background:#f6f6fb;color:#686d80;display:grid;place-items:center}
+.student-class-menu-trigger:hover{background:#eeedff;color:#514be8}
+.student-class-menu{position:absolute;z-index:15;right:0;top:42px;width:190px;padding:6px;background:#fff;border:1px solid #eceef4;border-radius:12px;box-shadow:0 12px 30px rgba(35,32,91,.14)}
+.student-class-menu button{width:100%;min-height:38px;padding:0 9px;display:flex;align-items:center;gap:9px;border:0;border-radius:8px;background:transparent;text-align:left;color:#555b70;font-size:10px;font-weight:650}
+.student-class-menu button:hover{background:#f3f2ff;color:#514be8}
+.student-class-modal-backdrop{position:fixed;z-index:100;inset:0;padding:20px;background:rgba(22,24,42,.38);display:grid;place-items:center}
+.student-class-modal{width:min(100%,460px);max-height:min(78vh,620px);overflow:auto;padding:20px;background:#fff;border-radius:18px;box-shadow:0 22px 70px rgba(20,20,45,.2)}
+.student-class-modal>header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px}
+.student-class-modal>header small,.student-class-teacher small{font-size:8px;letter-spacing:1px;font-weight:800;color:#a0a4b2}
+.student-class-modal>header h2{font-size:20px;margin:5px 0 0;color:#34384d}
+.student-class-modal>header button{width:34px;height:34px;border:0;border-radius:10px;background:#f4f4f8;color:#62677a;display:grid;place-items:center}
+.student-class-teacher{display:flex;align-items:center;gap:11px;padding:12px;border-radius:12px;background:#f7f7fc}
+.student-class-teacher>div{display:grid;gap:4px}
+.student-class-teacher strong{font-size:11px;color:#34384d}
+.student-class-roster-heading{display:flex;justify-content:space-between;align-items:center;margin:18px 0 10px;font-size:11px;color:#41455a}
+.student-class-roster-heading span{font-size:9px;color:#969bad}
+.student-class-roster{display:grid;gap:8px}
+.student-class-roster-item{display:flex;align-items:center;gap:9px;min-height:38px}
+.student-class-roster-item strong{font-size:10px;color:#555b70}
+.student-invite-page{min-height:100vh;padding:28px 18px;display:grid;place-items:center;background:radial-gradient(circle at 15% 10%,#eeedff 0,transparent 36%),#f7f8fc}
+.student-invite-card{width:min(100%,490px);padding:30px;background:#fff;border:1px solid #eceef4;border-radius:22px;box-shadow:0 18px 55px rgba(38,35,94,.08);text-align:center}
+.student-invite-mark{width:58px;height:58px;margin:0 auto 17px;display:grid;place-items:center;border-radius:18px;background:#eeedff;color:#625ce9}
+.student-invite-card>small{font-size:9px;letter-spacing:1.2px;font-weight:800;color:#8e91a4}
+.student-invite-card h1{font-size:24px;letter-spacing:-.7px;color:#30344a;margin:9px 0}
+.student-invite-card p{font-size:11px;line-height:1.8;color:#858a9d}
+.student-invite-class{margin:20px 0;padding:16px;border:1px solid #eceef4;border-radius:14px;background:#fafaff}
+.student-invite-class small{display:block;font-size:8px;letter-spacing:1px;color:#a0a4b2;font-weight:800}
+.student-invite-class strong{display:block;margin-top:6px;font-size:23px;color:#514be8}
+.student-invite-action{width:100%;min-height:46px;margin-top:14px;border:0;border-radius:12px;background:linear-gradient(135deg,#716cf5,#5049df);color:#fff;font-size:11px;font-weight:800}
+.student-invite-action:disabled{opacity:.55;cursor:not-allowed}
+.student-invite-note{font-size:9px!important;color:#9da1af!important}
