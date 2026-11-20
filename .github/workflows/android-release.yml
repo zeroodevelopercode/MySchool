@@ -160,10 +160,25 @@ jobs:
             exit 1
           fi
 
-          KEY_FINGERPRINT="$(keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android 2>/dev/null | awk -F': ' '/SHA256:/{gsub(/:/, "", $2); print tolower($2); exit}')"
-          APK_FINGERPRINT="$("$APKSIGNER" verify --print-certs "$APK" | awk -F': ' '/Signer #1 certificate SHA-256 digest:/{print tolower($2); exit}')"
+          KEY_OUTPUT="$(keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android 2>&1)"
+          KEY_FINGERPRINT="$(printf '%s\\n' "$KEY_OUTPUT" | grep -i 'SHA256:' | grep -Eo '[0-9A-Fa-f]{64}' | head -n 1 | tr '[:upper:]' '[:lower:]' || true)"
 
-          if [ -z "$KEY_FINGERPRINT" ] || [ -z "$APK_FINGERPRINT" ] || [ "$KEY_FINGERPRINT" != "$APK_FINGERPRINT" ]; then
+          if ! APK_OUTPUT="$("$APKSIGNER" verify --verbose --print-certs "$APK" 2>&1)"; then
+            printf '%s\\n' "$APK_OUTPUT"
+            echo "::error::apksigner could not verify the generated APK."
+            exit 1
+          fi
+          echo "apksigner certificate output:"
+          printf '%s\\n' "$APK_OUTPUT"
+          APK_FINGERPRINT="$(printf '%s\\n' "$APK_OUTPUT" | grep -i 'SHA-256' | grep -Eo '[0-9A-Fa-f]{64}' | head -n 1 | tr '[:upper:]' '[:lower:]' || true)"
+
+          if [ -z "$KEY_FINGERPRINT" ] || [ -z "$APK_FINGERPRINT" ]; then
+            echo "::error::Could not extract the SHA-256 certificate fingerprint."
+            echo "Keystore SHA-256: $KEY_FINGERPRINT"
+            echo "APK SHA-256: $APK_FINGERPRINT"
+            exit 1
+          fi
+          if [ "$KEY_FINGERPRINT" != "$APK_FINGERPRINT" ]; then
             echo "::error::APK certificate does not match the persistent signing key."
             echo "Keystore SHA-256: $KEY_FINGERPRINT"
             echo "APK SHA-256: $APK_FINGERPRINT"
