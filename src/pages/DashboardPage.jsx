@@ -223,7 +223,7 @@ export default function DashboardPage() {
   };
 
   const copyClassInvite = async (item) => {
-    const inviteUrl = window.location.origin + "/invite/" + item.id;
+    const inviteUrl = "https://myschool-umber.vercel.app/invite/" + item.id;
     try {
       await navigator.clipboard.writeText(inviteUrl);
       setPageNotice("Link undangan " + item.name + " berhasil disalin.");
