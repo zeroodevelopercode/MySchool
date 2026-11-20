@@ -295,7 +295,7 @@
 .student-form-success{color:#32946b}
 .student-announcement-form{max-width:650px;padding:20px;background:#fff;border:1px solid #eceef4;border-radius:16px}
 @media(min-width:900px){
- .nv-actions{left:calc(100% + 16px);top:50%;bottom:auto;transform:translateY(-50%);width:315px;height:185px}
+ .nv-actions{left:0;top:50%;bottom:auto;transform:translateY(-50%);width:220px;height:185px}
  .nv-action-0{left:0;top:68px}
  .nv-action-1{left:calc(50% - 33px);top:0}
  .nv-action-2{right:0;top:68px}
