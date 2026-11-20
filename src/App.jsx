@@ -7,13 +7,44 @@ import InvitePage from "./pages/InvitePage.jsx";
 import InstallPage from "./pages/InstallPage.jsx";
 import { App as NativeApp } from "@capacitor/app";
 import { Browser } from "@capacitor/browser";
-import { Capacitor } from "@capacitor/core";
+import { Capacitor, registerPlugin } from "@capacitor/core";
 import { supabase } from "./lib/supabase.js";
 
 function AppContent() {
   const { loading, user, profile, profileLoading } = useAuth();
+  const ApkUpdate = registerPlugin("ApkUpdate");
   const [path, setPath] = useState(window.location.pathname);
   const [appUpdate, setAppUpdate] = useState(null);
+  const [updateProgress, setUpdateProgress] = useState(0);
+  const [updateBusy, setUpdateBusy] = useState(false);
+  const [updateMessage, setUpdateMessage] = useState("");
+
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+    let subscription;
+    ApkUpdate.addListener("downloadProgress", event => {
+      setUpdateProgress(Math.max(0, Math.min(100, Number(event.percent) || 0)));
+    }).then(handle => { subscription = handle; });
+    return () => { subscription?.remove(); };
+  }, []);
+
+  const installAppUpdate = async () => {
+    if (!appUpdate || updateBusy) return;
+    setUpdateBusy(true);
+    setUpdateMessage("");
+    try {
+      const result = await ApkUpdate.downloadAndInstall({ url: appUpdate.url });
+      if (result?.permissionRequired) {
+        setUpdateMessage("Izinkan SekolahKu memasang pembaruan, lalu tekan Install update here sekali lagi.");
+        setUpdateBusy(false);
+      } else {
+        setUpdateMessage("Unduhan selesai. Lanjutkan konfirmasi di Package Installer Android.");
+      }
+    } catch (error) {
+      setUpdateMessage(error?.message || "Pembaruan gagal diproses. Coba lagi.");
+      setUpdateBusy(false);
+    }
+  };
 
   useEffect(() => {
     if (!Capacitor.isNativePlatform()) return;
@@ -111,9 +142,14 @@ function AppContent() {
           <strong>Pembaruan SekolahKu tersedia</strong>
           <span>Versi build {appUpdate.version} siap dipasang.</span>
         </div>
-        <button type="button" onClick={() => window.open(appUpdate.url, "_blank", "noopener,noreferrer")}>
-          Install update here
-        </button>
+        <div className="app-update-actions">
+          <button type="button" onClick={installAppUpdate} disabled={updateBusy}>
+            {updateBusy ? "Downloading..." : "Install update here"}
+          </button>
+          {updateBusy && <div className="app-update-progress"><span style={{ width: updateProgress + "%" }} /></div>}
+          {updateBusy && <small className="app-update-percent">{updateProgress}%</small>}
+          {updateMessage && <small className="app-update-message">{updateMessage}</small>}
+        </div>
         <button className="app-update-dismiss" type="button" aria-label="Tutup pemberitahuan" onClick={() => setAppUpdate(null)}>×</button>
       </aside>
     )}
