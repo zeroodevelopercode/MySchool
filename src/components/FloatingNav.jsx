@@ -1,6 +1,7 @@
 import { useCallback, useLayoutEffect, useRef, useState } from "react";
 import { motion, useMotionValue, useMotionValueEvent, useSpring, useTransform, AnimatePresence } from "framer-motion";
 import { Home, ClipboardCheck, CalendarDays, UserRound, Plus, Users, ClipboardList, School, Megaphone } from "lucide-react";
+import { Capacitor } from "@capacitor/core";
 
 export const TABS = [
   { id: "Beranda", label: "Beranda", icon: Home },
@@ -34,6 +35,7 @@ export default function FloatingNav({ active, onChange, hidden = false, role = "
   const wrap = useRef(null), itemsWrap = useRef(null), glass = useRef(null), line = useRef(null), shadow = useRef(null), first = useRef(true);
   const [w, setW] = useState(0);
   const canManage = ["developers", "teacher", "leader_school"].includes(role);
+  const isNativeApp = Capacitor.isNativePlatform();
   const items = canManage ? [...TABS.slice(0, 2), { id: "Aksi", label: "Aksi", icon: Plus }, ...TABS.slice(2)] : TABS;
   const selectedIndex = actionOpen && canManage ? 2 : Math.max(0, items.findIndex(tab => tab.id === active));
   const x = useMotionValue(0), sx = useSpring(x, SPRING), bubbleX = useTransform(sx, value => value - 26);
@@ -76,7 +78,7 @@ export default function FloatingNav({ active, onChange, hidden = false, role = "
     onChange(id);
   };
   return (
-    <motion.nav className={"nv" + (canManage ? " nv-manage" : "") + (hidden ? " nv-hidden" : "")} aria-label="Navigasi utama"
+    <motion.nav className={"nv" + (canManage ? " nv-manage" : "") + (isNativeApp ? " nv-native" : "") + (hidden ? " nv-hidden" : "")} aria-label="Navigasi utama"
       initial={false} animate={{ y: hidden ? 120 : 0, opacity: hidden ? 0 : 1 }}
       transition={{ type: "spring", stiffness: 260, damping: 30 }}>
       <div className="nv-wrap" ref={wrap}>
