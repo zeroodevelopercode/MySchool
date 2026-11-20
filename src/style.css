@@ -372,3 +372,11 @@
  .nv-action-2{left:calc(50% + 8px);right:auto;top:0}
  .nv-action-3{left:calc(50% - 33px);right:auto;top:116px}
 }
+
+
+/* Center action changes from Plus to Kelas; dismiss by tapping anywhere outside the dock */
+.student-header-logout{position:absolute;right:clamp(14px,4vw,48px);top:50%;transform:translateY(-50%);min-height:36px;padding:0 11px;display:inline-flex;align-items:center;justify-content:center;gap:7px;border:1px solid #eceef4;border-radius:10px;background:#fff;color:#bd505b;font-size:10px;font-weight:750;transition:background .2s,border-color .2s,opacity .2s}
+.student-header-logout:hover{background:#fff4f4;border-color:#f2d9dc}
+.student-header-logout:disabled{opacity:.55;cursor:wait}
+.nv-action-toggle .nv-label{font-size:9px}
+@media(max-width:420px){.student-header-logout{right:10px;min-height:33px;padding:0 8px;font-size:9px;gap:5px}.student-header-logout svg{width:14px;height:14px}}
