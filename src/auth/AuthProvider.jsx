@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { supabase, supabaseConfigured } from "../lib/supabase.js";
 import { Capacitor } from "@capacitor/core";
+import { Browser } from "@capacitor/browser";
 
 const AuthContext = createContext(null);
 const PROFILE_FIELDS = "id, full_name, avatar_url, birth_date, role, created_at, updated_at";
@@ -93,8 +94,21 @@ export function AuthProvider({ children }) {
     async signInWithProvider(provider) {
       if (window.location.pathname.startsWith("/invite/")) sessionStorage.setItem("sekolahku_post_auth_path", window.location.pathname);
       if (!supabaseConfigured) throw new Error("Konfigurasi Supabase belum tersedia. Tambahkan environment variable VITE_SUPABASE_URL dan VITE_SUPABASE_PUBLISHABLE_KEY.");
-      const redirectTo = Capacitor.isNativePlatform() ? "https://myschool-umber.vercel.app" : window.location.origin;
-      const { error } = await supabase.auth.signInWithOAuth({ provider, options: { redirectTo } });
+      if (Capacitor.isNativePlatform()) {
+        const redirectTo = "com.zeroodev.sekolahku://auth/callback";
+        const { data, error } = await supabase.auth.signInWithOAuth({
+          provider,
+          options: { redirectTo, skipBrowserRedirect: true }
+        });
+        if (error) throw error;
+        if (!data?.url) throw new Error("URL login Google tidak berhasil dibuat.");
+        await Browser.open({ url: data.url, presentationStyle: "popover" });
+        return;
+      }
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: { redirectTo: window.location.origin }
+      });
       if (error) throw error;
     },
     async signOut() {
