@@ -6,11 +6,36 @@ import DashboardPage from "./pages/DashboardPage.jsx";
 import InvitePage from "./pages/InvitePage.jsx";
 import InstallPage from "./pages/InstallPage.jsx";
 import { App as NativeApp } from "@capacitor/app";
+import { Capacitor } from "@capacitor/core";
 import { supabase } from "./lib/supabase.js";
 
 function AppContent() {
   const { loading, user, profile, profileLoading } = useAuth();
   const [path, setPath] = useState(window.location.pathname);
+  const [appUpdate, setAppUpdate] = useState(null);
+
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+    let active = true;
+    const currentBuild = Number(import.meta.env.VITE_ANDROID_BUILD_NUMBER || 0);
+    fetch("https://api.github.com/repos/zeroodevelopercode/MySchool/releases/latest", {
+      headers: { Accept: "application/vnd.github+json" }
+    })
+      .then(response => {
+        if (!response.ok) throw new Error("Gagal memeriksa versi aplikasi");
+        return response.json();
+      })
+      .then(release => {
+        const match = String(release.tag_name || "").match(/^android-build-(\\d+)$/);
+        const latestBuild = match ? Number(match[1]) : 0;
+        const apk = release.assets?.find(asset => asset.name === "SekolahKu.apk");
+        if (active && latestBuild > currentBuild && apk) {
+          setAppUpdate({ version: latestBuild, url: apk.browser_download_url });
+        }
+      })
+      .catch(error => console.warn("Pemeriksaan update SekolahKu:", error));
+    return () => { active = false; };
+  }, []);
 
   useEffect(() => {
     if (user?.id) {
@@ -60,7 +85,21 @@ function AppContent() {
   if (inviteMatch && (!user || (profile?.full_name && profile?.birth_date))) return <InvitePage classId={inviteMatch[1]} />;
   if (!user) return <WelcomePage />;
   if (!profile?.full_name || !profile?.birth_date) return <OnboardingPage />;
-  return <DashboardPage />;
+  return <>
+    <DashboardPage />
+    {appUpdate && (
+      <aside className="app-update-sheet" role="status">
+        <div className="app-update-copy">
+          <strong>Pembaruan SekolahKu tersedia</strong>
+          <span>Versi build {appUpdate.version} siap dipasang.</span>
+        </div>
+        <button type="button" onClick={() => window.open(appUpdate.url, "_blank", "noopener,noreferrer")}>
+          Install update here
+        </button>
+        <button className="app-update-dismiss" type="button" aria-label="Tutup pemberitahuan" onClick={() => setAppUpdate(null)}>×</button>
+      </aside>
+    )}
+  </>;
 }
 
 export default function App() {
