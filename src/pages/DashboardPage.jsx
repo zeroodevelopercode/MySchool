@@ -276,7 +276,7 @@ export default function DashboardPage() {
 
       {page === "Manage class" && <section className="student-page student-manage-page">
         <div className="student-page-heading"><span className="student-page-icon violet"><School size={23}/></span><div><span>MANAJEMEN SEKOLAH</span><h1>Manage class</h1></div></div>
-        <p className="student-manage-description">Buat dan kelola daftar kelas yang menjadi tanggung jawab akunmu.</p>
+        <p className="student-manage-description">Kelola kelas sekolah, lihat daftar murid dan wali kelas, lalu bagikan link undangan.</p>
         <form className="student-announcement-form" onSubmit={createClass}>
           <div className="student-form-field"><label htmlFor="new-class-name">Nama kelas</label><input id="new-class-name" value={newClassName} onChange={(e) => setNewClassName(e.target.value)} placeholder="Contoh: 7A, 8B, XII IPA 1" maxLength={60} required /></div>
           <button className="student-primary-action" type="submit" disabled={saving}>{saving ? "Menyimpan..." : "Buat kelas"}</button>
