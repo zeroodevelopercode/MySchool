@@ -64,7 +64,11 @@ export default function FloatingNav({ active, onChange, hidden = false, role = "
   useMotionValueEvent(sx, "change", apply);
   useLayoutEffect(() => { if (w) apply(sx.get()); }, [apply, sx, w]);
 
-  const selectAction = id => { onChange(id); };
+  const selectAction = id => {
+    // Tutup menu aksi sebelum berpindah halaman agar gelembung pengelola tidak tertinggal.
+    if (actionOpen) onActionToggle();
+    onChange(id);
+  };
   return (
     <motion.nav className={"nv" + (canManage ? " nv-manage" : "") + (hidden ? " nv-hidden" : "")} aria-label="Navigasi utama"
       initial={false} animate={{ y: hidden ? 120 : 0, opacity: hidden ? 0 : 1 }}
@@ -95,7 +99,7 @@ export default function FloatingNav({ active, onChange, hidden = false, role = "
                 }
               }}>
               <motion.span className="nv-icon" initial={false}
-                animate={{ y: selected ? -29 : 0, scale: selected ? 1.12 : 1, rotate: false }}
+                animate={{ y: selected ? -23 : 0, scale: selected ? 1.12 : 1, rotate: false }}
                 transition={{ type: "spring", ...SPRING }}>
                 {isAction ? (actionOpen ? <Megaphone size={21} strokeWidth={2.3}/> : <Plus size={22} strokeWidth={2.4}/>) : <Icon size={20} strokeWidth={2.1}/>}
               </motion.span>
