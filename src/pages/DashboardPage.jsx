@@ -61,12 +61,9 @@ export default function DashboardPage() {
     setPageNotice("");
   };
   const goBack = () => {
-    setHistory((previous) => {
-      const next = [...previous];
-      const previousPage = next.pop() || "Beranda";
-      setPage(previousPage);
-      return next;
-    });
+    const previousPage = history[history.length - 1] || "Beranda";
+    setHistory((previous) => previous.slice(0, -1));
+    setPage(previousPage);
   };
 
   useEffect(() => {
