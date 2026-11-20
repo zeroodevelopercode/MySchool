@@ -27,7 +27,7 @@ function AppContent() {
         return response.json();
       })
       .then(release => {
-        const match = String(release.tag_name || "").match(/^android-build-(\\d+)$/);
+        const match = String(release.tag_name || "").match(/^android-build-(\d+)$/);
         const latestBuild = match ? Number(match[1]) : 0;
         const apk = release.assets?.find(asset => asset.name === "SekolahKu.apk");
         if (active && latestBuild > currentBuild && apk) {
