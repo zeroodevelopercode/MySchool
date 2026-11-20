@@ -34,20 +34,15 @@ jobs:
           path: ~/.android/debug.keystore
           key: sekolahku-android-debug-keystore-v1
 
-      - name: Ensure Android debug signing key
+      - name: Require the existing Android signing key
         run: |
-          mkdir -p ~/.android
-          if [ ! -f ~/.android/debug.keystore ]; then
-            keytool -genkeypair -v \
-              -keystore ~/.android/debug.keystore \
-              -storepass android \
-              -alias androiddebugkey \
-              -keypass android \
-              -keyalg RSA \
-              -keysize 2048 \
-              -validity 10000 \
-              -dname "CN=Android Debug,O=Android,C=US"
+          if [ ! -s ~/.android/debug.keystore ]; then
+            echo "::error::The existing Android signing key was not restored."
+            echo "Refusing to generate a new key because it would make updates incompatible."
+            exit 1
           fi
+          keytool -list -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey >/dev/null
+          echo "Existing Android signing key is available."
 
       - name: Install dependencies
         run: npm install
@@ -155,6 +150,28 @@ jobs:
           cd android
           chmod +x gradlew
           ./gradlew assembleDebug
+
+      - name: Verify APK signing certificate
+        run: |
+          APK="android/app/build/outputs/apk/debug/app-debug.apk"
+          APKSIGNER="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -n 1)"
+          if [ ! -f "$APK" ] || [ -z "$APKSIGNER" ]; then
+            echo "::error::APK or apksigner was not found."
+            exit 1
+          fi
+
+          KEY_FINGERPRINT="$(keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android 2>/dev/null | awk -F': ' '/SHA256:/{gsub(/:/, "", $2); print tolower($2); exit}')"
+          APK_FINGERPRINT="$("$APKSIGNER" verify --print-certs "$APK" | awk -F': ' '/Signer #1 certificate SHA-256 digest:/{print tolower($2); exit}')"
+
+          if [ -z "$KEY_FINGERPRINT" ] || [ -z "$APK_FINGERPRINT" ] || [ "$KEY_FINGERPRINT" != "$APK_FINGERPRINT" ]; then
+            echo "::error::APK certificate does not match the persistent signing key."
+            echo "Keystore SHA-256: $KEY_FINGERPRINT"
+            echo "APK SHA-256: $APK_FINGERPRINT"
+            exit 1
+          fi
+
+          echo "APK signing certificate matches the persistent keystore."
+          echo "SHA-256: $APK_FINGERPRINT" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Publish APK
         env:
