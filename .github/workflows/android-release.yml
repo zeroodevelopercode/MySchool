@@ -74,11 +74,17 @@ jobs:
               <category android:name="android.intent.category.BROWSABLE" />
               <data android:scheme="https" android:host="myschool-umber.vercel.app" android:pathPrefix="/" />
           </intent-filter>"""
+          callback = """<intent-filter>
+              <action android:name="android.intent.action.VIEW" />
+              <category android:name="android.intent.category.DEFAULT" />
+              <category android:name="android.intent.category.BROWSABLE" />
+              <data android:scheme="com.zeroodev.sekolahku" android:host="auth" android:pathPrefix="/callback" />
+          </intent-filter>"""
           start = s.find("<activity")
           end = s.find(">", start)
           if start < 0 or end < 0:
               raise SystemExit("Main Android activity was not found")
-          s = s[:end + 1] + "\n            " + marker + s[end + 1:]
+          s = s[:end + 1] + "\n            " + marker + "\n            " + callback + s[end + 1:]
           p.write_text(s)
           PY
           npx cap sync android
