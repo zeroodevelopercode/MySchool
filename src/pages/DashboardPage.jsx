@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import FloatingNav from "../components/FloatingNav.jsx";
-import { Home, ClipboardCheck, CalendarDays, UserRound, GraduationCap, BookOpen, Clock3, Mail, Cake, Users, CalendarPlus, LogOut } from "lucide-react";
+import { Home, ClipboardCheck, CalendarDays, UserRound, GraduationCap, BookOpen, Clock3, Mail, Cake, Users, CalendarPlus } from "lucide-react";
 import { useAuth } from "../auth/AuthProvider.jsx";
 
 const navigation = [
@@ -26,31 +26,18 @@ function formatBirthDate(dateString) {
 }
 
 export default function DashboardPage() {
-  const { user, profile, signOut } = useAuth();
+  const { user, profile } = useAuth();
   const [page, setPage] = useState("Beranda");
-  const [logoutBusy, setLogoutBusy] = useState(false);
-  const [notice, setNotice] = useState("");
   const displayName = profile?.full_name || "Siswa";
   const email = user?.email || "Email tidak tersedia";
   const age = useMemo(() => calculateAge(profile?.birth_date), [profile?.birth_date]);
   const role = profile?.role || "student";
   const isSchoolStaff = role === "teacher" || role === "admin" || role === "principal" || role === "headmaster";
 
-  async function handleLogout() {
-    setLogoutBusy(true);
-    setNotice("");
-    try {
-      await signOut();
-    } catch (error) {
-      setNotice(error.message || "Logout gagal. Coba lagi.");
-      setLogoutBusy(false);
-    }
-  }
-
   return <div className="student-app">
     <header className="student-topbar">
-      <div className="student-brand"><span className="student-brand-icon"><GraduationCap size={21}/></span><span>SekolahKu<small>RUANG BELAJAR SISWA</small></span></div>
-      <button className="student-logout" onClick={handleLogout} disabled={logoutBusy}><LogOut size={16}/><span>{logoutBusy ? "Keluar..." : "Keluar"}</span></button>
+      <span className="student-brand-icon" aria-label="Logo SekolahKu"><GraduationCap size={22}/></span>
+      <div className="student-header-title"><strong>SekolahKu</strong><small>RUANG BELAJAR SISWA</small></div>
     </header>
 
     <main className="student-main" key={page}>
@@ -96,7 +83,6 @@ export default function DashboardPage() {
         </div>
       </section>}
 
-      {notice && <p className="student-notice" role="alert">{notice}</p>}
     </main>
 
     <FloatingNav active={page} onChange={setPage} />
