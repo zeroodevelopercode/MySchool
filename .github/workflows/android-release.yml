@@ -145,6 +145,55 @@ jobs:
           gradle.write_text(g[:start] + block + g[end:])
           PY
 
+      - name: Configure APK signing with the persistent key
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          gradle = Path("android/app/build.gradle")
+          if not gradle.exists():
+              gradle = Path("android/app/build.gradle.kts")
+          s = gradle.read_text()
+          if gradle.suffix == ".kts":
+              signing = """
+          android {
+              signingConfigs {
+                  getByName("debug") {
+                      storeFile = file(System.getProperty("user.home") + "/.android/debug.keystore")
+                      storePassword = "android"
+                      keyAlias = "androiddebugkey"
+                      keyPassword = "android"
+                  }
+              }
+              buildTypes {
+                  getByName("debug") {
+                      signingConfig = signingConfigs.getByName("debug")
+                  }
+              }
+          }
+          """
+          else:
+              signing = """
+          android {
+              signingConfigs {
+                  debug {
+                      storeFile file(System.getProperty("user.home") + "/.android/debug.keystore")
+                      storePassword "android"
+                      keyAlias "androiddebugkey"
+                      keyPassword "android"
+                  }
+              }
+              buildTypes {
+                  debug {
+                      signingConfig signingConfigs.debug
+                  }
+              }
+          }
+          """
+          if "sekolahku-persistent-debug-signing" not in s:
+              s += "\n// sekolahku-persistent-debug-signing\n" + signing
+          gradle.write_text(s)
+          PY
+
       - name: Build APK
         run: |
           cd android
@@ -153,35 +202,35 @@ jobs:
 
       - name: Verify APK signing certificate
         run: |
+          set -euo pipefail
           APK="android/app/build/outputs/apk/debug/app-debug.apk"
           APKSIGNER="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -n 1)"
-          if [ ! -f "$APK" ] || [ -z "$APKSIGNER" ]; then
-            echo "::error::APK or apksigner was not found."
+          KEYSTORE="$HOME/.android/debug.keystore"
+          if [ ! -s "$APK" ] || [ -z "$APKSIGNER" ] || [ ! -s "$KEYSTORE" ]; then
+            echo "::error::APK, apksigner, or persistent keystore is missing."
             exit 1
           fi
 
-          KEY_OUTPUT="$(keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android 2>&1)"
-          KEY_FINGERPRINT="$(printf '%s\\n' "$KEY_OUTPUT" | grep -i 'SHA256:' | grep -Eo '[0-9A-Fa-f]{64}' | head -n 1 | tr '[:upper:]' '[:lower:]' || true)"
+          KEY_OUTPUT="$(keytool -list -v -keystore "$KEYSTORE" -alias androiddebugkey -storepass android -keypass android 2>&1)"
+          KEY_FINGERPRINT="$(printf '%s\n' "$KEY_OUTPUT" | sed -nE 's/.*SHA256:[[:space:]]*([0-9A-Fa-f:]+).*/\1/p' | head -n 1 | tr -d ':' | tr '[:upper:]' '[:lower:]')"
+          if [ -z "$KEY_FINGERPRINT" ]; then
+            printf '%s\n' "$KEY_OUTPUT"
+            echo "::error::Could not read SHA-256 fingerprint from persistent keystore."
+            exit 1
+          fi
 
           if ! APK_OUTPUT="$("$APKSIGNER" verify --verbose --print-certs "$APK" 2>&1)"; then
-            printf '%s\\n' "$APK_OUTPUT"
-            echo "::error::apksigner could not verify the generated APK."
+            printf '%s\n' "$APK_OUTPUT"
+            echo "::error::Generated APK signature is invalid."
             exit 1
           fi
-          echo "apksigner certificate output:"
-          printf '%s\\n' "$APK_OUTPUT"
-          APK_FINGERPRINT="$(printf '%s\\n' "$APK_OUTPUT" | grep -i 'SHA-256' | grep -Eo '[0-9A-Fa-f]{64}' | head -n 1 | tr '[:upper:]' '[:lower:]' || true)"
+          printf '%s\n' "$APK_OUTPUT"
+          APK_FINGERPRINT="$(printf '%s\n' "$APK_OUTPUT" | sed -nE 's/.*certificate SHA-256 digest:[[:space:]]*([0-9A-Fa-f:]+).*/\1/p' | head -n 1 | tr -d ':' | tr '[:upper:]' '[:lower:]')"
 
-          if [ -z "$KEY_FINGERPRINT" ] || [ -z "$APK_FINGERPRINT" ]; then
-            echo "::error::Could not extract the SHA-256 certificate fingerprint."
-            echo "Keystore SHA-256: $KEY_FINGERPRINT"
-            echo "APK SHA-256: $APK_FINGERPRINT"
-            exit 1
-          fi
-          if [ "$KEY_FINGERPRINT" != "$APK_FINGERPRINT" ]; then
-            echo "::error::APK certificate does not match the persistent signing key."
-            echo "Keystore SHA-256: $KEY_FINGERPRINT"
-            echo "APK SHA-256: $APK_FINGERPRINT"
+          echo "Keystore SHA-256: $KEY_FINGERPRINT"
+          echo "APK SHA-256: $APK_FINGERPRINT"
+          if [ -z "$APK_FINGERPRINT" ] || [ "$KEY_FINGERPRINT" != "$APK_FINGERPRINT" ]; then
+            echo "::error::APK is not signed with the persistent Android key."
             exit 1
           fi
 
