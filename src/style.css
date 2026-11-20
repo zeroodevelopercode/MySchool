@@ -322,3 +322,9 @@
  .nv-action-1{left:calc(50% - 33px);right:auto;top:0}
  .nv-action-2{left:auto;right:0;top:58px}
 }
+
+/* --- Four management actions around the center navigation button --- */
+@media(max-width:899px){
+ .nv-actions{height:178px}
+ .nv-action-3{left:calc(50% - 33px);right:auto;top:116px}
+}
