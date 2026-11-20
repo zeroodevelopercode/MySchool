@@ -27,7 +27,8 @@ public class ApkUpdatePlugin extends Plugin {
         manager = (DownloadManager) getContext().getSystemService(Context.DOWNLOAD_SERVICE);
         long savedId = getContext().getSharedPreferences("sekolahku_updates", Context.MODE_PRIVATE).getLong("download_id", -1L);
         if (savedId > 0 && isDownloadSuccessful(savedId)) {
-            installOrRequestPermission(savedId, call);
+            installOrRequestPermission(savedId);
+            call.resolve();
             return;
         }
 
@@ -47,7 +48,8 @@ public class ApkUpdatePlugin extends Plugin {
         request.setDestinationInExternalFilesDir(getContext(), Environment.DIRECTORY_DOWNLOADS, "SekolahKu-update.apk");
         long id = manager.enqueue(request);
         getContext().getSharedPreferences("sekolahku_updates", Context.MODE_PRIVATE).edit().putLong("download_id", id).apply();
-        pollDownload(id, call);
+        call.resolve();
+        pollDownload(id);
     }
 
     private boolean isDownloadSuccessful(long id) {
@@ -60,13 +62,13 @@ public class ApkUpdatePlugin extends Plugin {
         }
     }
 
-    private void pollDownload(long id, PluginCall call) {
+    private void pollDownload(long id) {
         Runnable poller = new Runnable() {
             @Override public void run() {
                 DownloadManager.Query query = new DownloadManager.Query().setFilterById(id);
                 try (Cursor cursor = manager.query(query)) {
                     if (cursor == null || !cursor.moveToFirst()) {
-                        call.reject("Unduhan pembaruan tidak ditemukan.");
+                        notifyUpdateError("Unduhan pembaruan tidak ditemukan.");
                         return;
                     }
                     int status = cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS));
@@ -79,22 +81,22 @@ public class ApkUpdatePlugin extends Plugin {
                     notifyListeners("downloadProgress", progress);
 
                     if (status == DownloadManager.STATUS_SUCCESSFUL) {
-                        installOrRequestPermission(id, call);
+                        installOrRequestPermission(id);
                     } else if (status == DownloadManager.STATUS_FAILED) {
                         int reason = cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_REASON));
-                        call.reject("Unduhan APK gagal. Kode: " + reason);
+                        notifyUpdateError("Unduhan APK gagal. Kode: " + reason);
                     } else {
                         handler.postDelayed(this, 450);
                     }
                 } catch (Exception error) {
-                    call.reject("Gagal memeriksa unduhan: " + error.getMessage());
+                    notifyUpdateError("Gagal memeriksa unduhan: " + error.getMessage());
                 }
             }
         };
         handler.post(poller);
     }
 
-    private void installOrRequestPermission(long id, PluginCall call) {
+    private void installOrRequestPermission(long id) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && !getContext().getPackageManager().canRequestPackageInstalls()) {
             Intent settings = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
                 Uri.parse("package:" + getContext().getPackageName()));
@@ -102,13 +104,13 @@ public class ApkUpdatePlugin extends Plugin {
             getContext().startActivity(settings);
             JSObject result = new JSObject();
             result.put("permissionRequired", true);
-            call.resolve(result);
+            notifyListeners("installPermissionRequired", result);
             return;
         }
 
         Uri apkUri = manager.getUriForDownloadedFile(id);
         if (apkUri == null) {
-            call.reject("File APK hasil unduhan tidak tersedia.");
+            notifyUpdateError("File APK hasil unduhan tidak tersedia.");
             return;
         }
         Intent install = new Intent(Intent.ACTION_VIEW);
@@ -116,9 +118,14 @@ public class ApkUpdatePlugin extends Plugin {
         install.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION);
         try {
             getContext().startActivity(install);
-            call.resolve();
         } catch (Exception error) {
-            call.reject("Android tidak dapat membuka Package Installer: " + error.getMessage());
+            notifyUpdateError("Android tidak dapat membuka Package Installer: " + error.getMessage());
         }
+    }
+
+    private void notifyUpdateError(String message) {
+        JSObject result = new JSObject();
+        result.put("message", message);
+        notifyListeners("updateError", result);
     }
 }
