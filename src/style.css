@@ -300,7 +300,6 @@
  .nv-action-1{left:calc(50% - 33px);top:0}
  .nv-action-2{right:0;top:68px}
  .nv-items{display:flex;flex-direction:column;gap:7px}
- .nv-action-toggle{order:3}
 }
 @media(max-width:650px){
  .student-manage-page .student-page-heading h1{font-size:20px}
