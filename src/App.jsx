@@ -71,7 +71,7 @@ function AppContent() {
         const candidates = releases
           .filter(release => !release.draft)
           .map(release => {
-            const match = String(release.tag_name || "").match(/^android-build-(\\d+)$/);
+            const match = String(release.tag_name || "").match(/^android-build-(\d+)$/);
             const apk = release.assets?.find(asset => asset.name === "SekolahKu.apk");
             return match && apk
               ? { version: Number(match[1]), url: apk.browser_download_url }
