@@ -17,11 +17,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
 
       - name: Restore Android debug signing key
         uses: actions/cache@v4
@@ -44,11 +49,17 @@ jobs:
           from pathlib import Path
           p = Path("android/app/src/main/AndroidManifest.xml")
           s = p.read_text()
-          marker = '<intent-filter android:autoVerify="true">\n                <action android:name="android.intent.action.VIEW" />\n                <category android:name="android.intent.category.DEFAULT" />\n                <category android:name="android.intent.category.BROWSABLE" />\n                <data android:scheme="https" android:host="myschool-umber.vercel.app" android:pathPrefix="/" />\n            </intent-filter>'
-          needle = '<activity'
-          start = s.find(needle)
-          end = s.find('>', start)
-          s = s[:end+1] + '\n            ' + marker + s[end+1:]
+          marker = """<intent-filter android:autoVerify="true">
+              <action android:name="android.intent.action.VIEW" />
+              <category android:name="android.intent.category.DEFAULT" />
+              <category android:name="android.intent.category.BROWSABLE" />
+              <data android:scheme="https" android:host="myschool-umber.vercel.app" android:pathPrefix="/" />
+          </intent-filter>"""
+          start = s.find("<activity")
+          end = s.find(">", start)
+          if start < 0 or end < 0:
+              raise SystemExit("Main Android activity was not found")
+          s = s[:end + 1] + "\\n            " + marker + s[end + 1:]
           p.write_text(s)
           PY
           npx cap sync android
@@ -65,31 +76,34 @@ jobs:
         run: |
           mkdir -p release
           cp android/app/build/outputs/apk/debug/app-debug.apk release/SekolahKu.apk
-          gh release create android-build-${{ github.run_number }} release/SekolahKu.apk \
-            --title "SekolahKu Android build ${{ github.run_number }}" \
-            --notes "Build otomatis dari commit ${{ github.sha }}. Untuk pengujian Android."
+          gh release create android-build-${{ github.run_number }} release/SekolahKu.apk \\
+            --title "SekolahKu Android build ${{ github.run_number }}" \\
+            --notes "Build otomatis dari commit ${{ github.sha }}. APK debug untuk pengujian."
 
       - name: Publish signing fingerprint for App Links
+        id: fingerprint
         run: |
           mkdir -p public/.well-known
-          keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android 2>/dev/null | awk -F': ' '/SHA256:/{print $2; exit}' > /tmp/sha256
-          FINGERPRINT=$(cat /tmp/sha256 | tr -d ':')\n          echo "value=$FINGERPRINT" >> "$GITHUB_OUTPUT"
+          FINGERPRINT=$(keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android 2>/dev/null | awk -F': ' '/SHA256:/{print $2; exit}' | tr -d ':')
+          if [ -z "$FINGERPRINT" ]; then echo "Signing fingerprint not found"; exit 1; fi
+          echo "value=$FINGERPRINT" >> "$GITHUB_OUTPUT"
+          export FINGERPRINT
           python3 - <<'PY'
           import json, os
           fingerprint = os.environ["FINGERPRINT"]
+          formatted = ":".join(fingerprint[i:i+2] for i in range(0, len(fingerprint), 2))
           data = [{
             "relation": ["delegate_permission/common.handle_all_urls"],
             "target": {
               "namespace": "android_app",
               "package_name": "com.zeroodev.sekolahku",
-              "sha256_cert_fingerprints": [":".join(fingerprint[i:i+2] for i in range(0, len(fingerprint), 2))]
+              "sha256_cert_fingerprints": [formatted]
             }
           }]
           with open("public/.well-known/assetlinks.json", "w") as f:
             json.dump(data, f, indent=2)
           PY
-        env:
-          FINGERPRINT: ${{ env.FINGERPRINT }}
+          echo "Android App Links SHA-256: $FINGERPRINT" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Commit App Links verification file
         run: |
