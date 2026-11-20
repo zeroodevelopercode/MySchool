@@ -41,7 +41,19 @@ export default function InvitePage({ classId }) {
     else setNotice(data?.message || "Berhasil bergabung ke kelas " + (invite?.class_name || "") + ".");
   };
 
-  if (!isNativeApp) return <main className="student-invite-page">\n    <section className="student-invite-card">\n      <div className="student-invite-mark"><GraduationCap size={29}/></div>\n      <small>SEKOLAHKU • UNDANGAN KELAS</small>\n      <h1>Buka undangan di aplikasi</h1>\n      <p>Link undangan kelas hanya bisa dibuka melalui aplikasi SekolahKu. Website tidak dapat menerima undangan kelas.</p>\n      <div className="student-invite-class"><strong>Kenapa link ditolak?</strong><span> Aplikasi SekolahKu belum terdeteksi di perangkat ini, atau link dibuka melalui browser.</span></div>\n      <a className="student-invite-action" href="https://github.com/zeroodevelopercode/MySchool/releases/latest/download/SekolahKu.apk">Download / Install SekolahKu</a>\n      <p className="student-invite-note">Setelah aplikasi terpasang, buka kembali link undangan yang sama. Android akan mengarahkannya ke aplikasi jika App Links sudah terverifikasi.</p>\n    </section>\n  </main>;\n\n  return <main className="student-invite-page">
+  if (!isNativeApp) return <main className="student-invite-page">
+    <section className="student-invite-card">
+      <div className="student-invite-mark"><GraduationCap size={29}/></div>
+      <small>SEKOLAHKU • UNDANGAN KELAS</small>
+      <h1>Buka undangan di aplikasi</h1>
+      <p>Link undangan kelas hanya bisa dibuka melalui aplikasi SekolahKu. Website tidak dapat menerima undangan kelas.</p>
+      <div className="student-invite-class"><strong>Kenapa link ditolak?</strong><span> Aplikasi SekolahKu belum terdeteksi di perangkat ini, atau link dibuka melalui browser.</span></div>
+      <a className="student-invite-action" href="https://github.com/zeroodevelopercode/MySchool/releases/latest/download/SekolahKu.apk">Download / Install SekolahKu</a>
+      <p className="student-invite-note">Setelah aplikasi terpasang, buka kembali link undangan yang sama. Android akan mengarahkannya ke aplikasi jika App Links sudah terverifikasi.</p>
+    </section>
+  </main>;
+
+  return <main className="student-invite-page">
     <section className="student-invite-card">
       <div className="student-invite-mark"><GraduationCap size={29}/></div>
       <small>SEKOLAHKU • CLASS INVITATION</small>
@@ -56,7 +68,8 @@ export default function InvitePage({ classId }) {
         {error && <p className="student-form-error">{error}</p>}
         {notice && <button className="student-invite-action" onClick={() => window.location.assign("/")}>Masuk ke SekolahKu</button>}
       </>}
-      {!user && <p className="student-invite-note">Belum punya akun SekolahKu? Daftar terlebih dahulu. Undangan tidak dapat diterima sebelum pendaftaran dan login selesai.</p>}\n      <p className="student-invite-note">Link undangan ini khusus untuk pendaftaran anggota kelas SekolahKu.</p>
+      {!user && <p className="student-invite-note">Belum punya akun SekolahKu? Daftar terlebih dahulu. Undangan tidak dapat diterima sebelum pendaftaran dan login selesai.</p>}
+      <p className="student-invite-note">Link undangan ini khusus untuk pendaftaran anggota kelas SekolahKu.</p>
     </section>
   </main>;
 }
