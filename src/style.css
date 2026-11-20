@@ -123,7 +123,7 @@
 .nv-shadow path{fill:#fff}
 .nv-glass{position:absolute;inset:0;background:rgba(255,255,255,.88);backdrop-filter:blur(22px) saturate(1.5);-webkit-backdrop-filter:blur(22px) saturate(1.5);border:1px solid rgba(255,255,255,.8);border-radius:17px;clip-path:inset(0 round 17px)}
 .nv-line path{fill:none;stroke:rgba(107,101,224,.13);stroke-width:1.15;stroke-linejoin:round}
-.nv-bubble{position:absolute;z-index:2;top:-26px;left:0;width:52px;height:52px;border-radius:50%;background:linear-gradient(145deg,#716cf5,#5049df);border:5px solid #f8f8ff;box-shadow:0 5px 13px rgba(75,69,205,.24);pointer-events:none}
+.nv-bubble{position:absolute;z-index:2;top:-26px;left:0;width:52px;height:52px;border-radius:50%;background:linear-gradient(145deg,#716cf5,#5049df);border:5px solid #625ce9;box-shadow:0 5px 13px rgba(75,69,205,.24);pointer-events:none}
 .nv-items{position:absolute;inset:0;z-index:3;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));padding:0 9px}
 .nv-item{position:relative;min-width:0;border:0;background:transparent;color:#969bad;border-radius:12px;display:flex;align-items:flex-end;justify-content:center;padding:0 2px 8px;outline:none;-webkit-tap-highlight-color:transparent}
 .nv-item:focus-visible{outline:2px solid #817cf0;outline-offset:-4px}
