@@ -1,12 +1,22 @@
 import { useState } from "react";
 import { Github, GraduationCap, ArrowUpRight } from "lucide-react";
+import { useAuth } from "../auth/AuthProvider.jsx";
 import "./WelcomePage.css";
 
 export default function WelcomePage() {
+  const { signInWithProvider, supabaseConfigured } = useAuth();
   const [notice, setNotice] = useState("");
+  const [busy, setBusy] = useState("");
 
-  const showSetupNotice = (provider) => {
-    setNotice(`Login ${provider} belum diaktifkan. Konfigurasi OAuth perlu diselesaikan terlebih dahulu.`);
+  const signIn = async (provider) => {
+    setNotice("");
+    setBusy(provider);
+    try {
+      await signInWithProvider(provider);
+    } catch (error) {
+      setNotice(error.message || "Login gagal dimulai. Coba lagi.");
+      setBusy("");
+    }
   };
 
   return (
@@ -25,17 +35,18 @@ export default function WelcomePage() {
       </section>
       <section className="auth-actions" aria-label="Pilihan login">
         <p className="auth-prompt">Pilih login di bawah ini</p>
-        <button className="auth-provider google-provider" onClick={() => showSetupNotice("Google")}>
+        <button className="auth-provider google-provider" onClick={() => signIn("google")} disabled={Boolean(busy) || !supabaseConfigured}>
           <span className="google-g" aria-hidden="true">G</span>
-          <span>Continue with Google</span>
+          <span>{busy === "google" ? "Menghubungkan..." : "Continue with Google"}</span>
           <ArrowUpRight size={17} className="provider-arrow" />
         </button>
-        <button className="auth-provider github-provider" onClick={() => showSetupNotice("GitHub")}>
+        <button className="auth-provider github-provider" onClick={() => signIn("github")} disabled={Boolean(busy) || !supabaseConfigured}>
           <Github size={19} />
-          <span>Continue with GitHub</span>
+          <span>{busy === "github" ? "Menghubungkan..." : "Continue with GitHub"}</span>
           <ArrowUpRight size={17} className="provider-arrow" />
         </button>
-        {notice && <p className="auth-notice" role="status">{notice}</p>}
+        {!supabaseConfigured && <p className="auth-notice" role="status">Supabase belum dikonfigurasi pada environment aplikasi.</p>}
+        {notice && <p className="auth-notice" role="alert">{notice}</p>}
         <p className="auth-terms">Dengan melanjutkan, kamu menyetujui ketentuan penggunaan SekolahKu.</p>
       </section>
     </main>
